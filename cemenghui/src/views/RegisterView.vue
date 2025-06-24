@@ -20,6 +20,7 @@
               placeholder="请输入用户名"
               size="large"
             ></el-input>
+            <div class="input-tip">用户名长度不少于3个字符</div>
           </el-form-item>
           
           <!-- 昵称输入 -->
@@ -29,6 +30,7 @@
               placeholder="请输入昵称"
               size="large"
             ></el-input>
+            <div class="input-tip">昵称长度不少于2个字符</div>
           </el-form-item>
           
           <!-- 邮箱输入 -->
@@ -39,6 +41,7 @@
               placeholder="请输入邮箱地址（可选）"
               size="large"
             ></el-input>
+            <div class="input-tip">请输入有效邮箱地址（可选）</div>
           </el-form-item>
           
           <!-- 手机号输入 -->
@@ -48,6 +51,7 @@
               placeholder="请输入手机号（可选）"
               size="large"
             ></el-input>
+            <div class="input-tip">请输入11位手机号（可选）</div>
           </el-form-item>
           
           <!-- 企业信息输入 -->
@@ -57,6 +61,7 @@
               placeholder="请输入企业全称"
               size="large"
             ></el-input>
+            <div class="input-tip">企业全称不能为空</div>
           </el-form-item>
           
           <!-- 性别选择 -->
@@ -75,6 +80,7 @@
               placeholder="请输入密码"
               size="large"
             ></el-input>
+            <div class="input-tip">密码长度不少于6个字符</div>
           </el-form-item>
           
           <!-- 确认密码输入 -->
@@ -85,6 +91,7 @@
               placeholder="请再次输入密码"
               size="large"
             ></el-input>
+            <div class="input-tip">两次输入需一致</div>
           </el-form-item>
           
           <!-- 注册按钮 -->
@@ -258,35 +265,51 @@ export default {
     },
     // 处理注册
     async handleRegister() {
-      if (!this.validateForm()) return;
+      if (!this.validateForm()) {
+        this.errorMessage = "注册信息格式有误，请检查各项输入";
+        this.showErrorModal = true;
+        return;
+      }
+      
       this.loading = true;
+      
       try {
         const response = await axios.post('http://localhost:8080/register', {
-          company: this.companyInfo,
           username: this.username,
+          email: this.email,
           password: this.password,
+          companyInfo: this.companyInfo,
+          type: 'enterprise', // 默认为企业用户
           nickname: this.nickname,
           phone: this.phone,
-          email: this.email,
-          gender: this.gender,
-          status: 1,
-          is_super: 0
+          gender: this.gender
         });
-
-        if (response.data && (response.data.code === 0 || response.data.code === 200)) {
+        
+        console.log('注册响应:', response);
+        
+        if (response.data && response.data.code === 200) {
+          // 注册成功
           this.showSuccessModal = true;
           ElMessage.success('注册成功！');
+          
+          // 3秒后跳转到登录页面
           setTimeout(() => {
             this.$router.push("/login");
           }, 3000);
         } else {
-          this.errorMessage = response.data?.msg || "注册失败，请稍后重试";
+          // 注册失败
+          this.errorMessage = response.data?.message || "注册失败，请稍后重试";
           this.showErrorModal = true;
           ElMessage.error(this.errorMessage);
         }
       } catch (error) {
         console.error('注册请求错误:', error);
+        
         if (error.response) {
+          console.log('响应状态码:', error.response.status);
+          console.log('响应数据:', error.response.data);
+          
+          // 根据不同的错误状态码显示不同的错误信息
           if (error.response.status === 409) {
             this.errorMessage = "用户名或邮箱已存在，请使用其他信息";
           } else if (error.response.status === 400) {
@@ -301,6 +324,7 @@ export default {
         } else {
           this.errorMessage = "注册失败，请稍后重试";
         }
+        
         this.showErrorModal = true;
         ElMessage.error(this.errorMessage);
       } finally {
@@ -467,5 +491,12 @@ export default {
   .background {
     filter: blur(2px);
   }
+}
+
+.input-tip {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+  margin-left: 2px;
 }
 </style>
