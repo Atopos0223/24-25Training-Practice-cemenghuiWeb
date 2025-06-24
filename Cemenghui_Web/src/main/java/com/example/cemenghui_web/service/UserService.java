@@ -14,4 +14,12 @@ public class UserService {
         System.out.println(userMapper.LoginSearch(user));
         return userMapper.LoginSearch(user);
     }
+
+    public void register(User user) {
+        userMapper.register(user);
+    }
+
+    public User findByUsername(String username) {
+        return userMapper.findByUsername(username);
+    }
 }
