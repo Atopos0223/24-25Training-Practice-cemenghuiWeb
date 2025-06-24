@@ -29,7 +29,7 @@
 import { User, Lock } from '@element-plus/icons-vue';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
-import { ref, defineComponent, reactive } from 'vue';
+import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -44,7 +44,6 @@ export default defineComponent({
       username: '',
       password: ''
     });
-
     const handleLogin = async () => {
       loading.value = true;
       try {
@@ -52,24 +51,37 @@ export default defineComponent({
           username: uname.value,
           password: upwd.value,
         });
-		  if (res.data?.code === 200) {
-		      // 保存token和用户信息
-		      localStorage.setItem('token', res.data.token);
-		      localStorage.setItem('userInfo', JSON.stringify({
-		        username: uname.value,
-		      }));
-			  await router.push('/user-home'); 
-		    } else {
-		      ElMessage.error(res.data?.message || '登录失败');
-		    }
-		  } catch (error) {
-		    console.error('请求错误:', error);
-		    ElMessage.error('网络异常，请重试');
-		  } finally {
-		    loading.value = false;
-		  }
-		}  
-		  
+        
+        // 打印完整的响应对象
+        console.log('完整响应对象:', res);
+        // 打印响应数据
+        console.log('响应数据:', res.data);
+        // 打印code属性（注意可能的正确位置）
+        console.log('res.code:', res.code);
+        console.log('res.data.code:', res.data.code);
+        
+        if (res.data && res.data.code === 200) {
+          if (res.data.data.is_super === 1) {  // 注意：可能需要访问 res.data.data
+            router.push('/adminhome');
+          } else {
+            router.push('/userhome'); 
+          }
+        } else {
+          ElMessage.error(res.data ? res.data.message : '未知错误');
+        }
+      } catch (error) {
+        console.error('请求错误:', error);
+        if (error.response) {
+          console.log('响应状态码:', error.response.status);
+          console.log('响应数据:', error.response.data);
+        }
+        ElMessage.error('网络异常，请重试');
+      } finally {
+        loading.value = false;
+      } 
+    };
+    
+    
     // 处理注册
     const handleRegister = () => {
       router.push('/register');
