@@ -10,10 +10,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import Echarts from 'vue-echarts'
 import 'echarts'
 
-
 import App from './App.vue'
 import router from './router'
-
 const app = createApp(App)
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
@@ -25,3 +23,6 @@ app.use(createPinia())
 app.use(router)
 app.use(EmelentPlus)
 app.mount('#app')
+
+app.use(createPinia())
+
