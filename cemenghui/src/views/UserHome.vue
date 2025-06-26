@@ -23,67 +23,67 @@
                      <el-icon><User /></el-icon>
                      <span>个人信息管理</span>
                    </template>
-                   <el-menu-item index="/user-home/basic-info" class="menu-item">
+                   <el-menu-item index="/userhome/basic-info" class="menu-item">
                      <span>基本资料修改</span>
                    </el-menu-item>
-                   <el-menu-item index="/user-home/change-password" class="menu-item">
+                   <el-menu-item index="/userhome/change-password" class="menu-item">
                      <span>修改密码</span>
 					  </el-menu-item>
-					 <el-menu-item index="/user-home/view-info" class="menu-item">
+					 <el-menu-item index="/userhome/view-info" class="menu-item">
 					   <span>查看信息</span>
                    </el-menu-item>
                  </el-sub-menu>
 				 
-   <!-- 行业动态下拉菜单 -->
-   <el-sub-menu index="industryDynamic">
-     <template #title>
-       <el-icon><DataBoard /></el-icon>
-       <span>行业动态</span>
-     </template>
-     <el-menu-item index="/industry-dynamic/publish" class="menu-item">
-       <span>发布动态</span>
-     </el-menu-item>
-     <el-menu-item index="/industry-dynamic/list" class="menu-item">
-       <span>动态列表</span>
-     </el-menu-item>
-   </el-sub-menu>
-   
-  <!-- 课程管理下拉菜单 -->
-  <el-sub-menu index="course-manage">
-    <template #title>
-      <el-icon><Collection /></el-icon>
-      <span>课程管理</span>
-    </template>
-    <el-menu-item index="/course-manage/add" class="menu-item">
-      <span>添加课程</span>
-    </el-menu-item>
-    <el-menu-item index="/course-manage/list" class="menu-item">
-      <span>课程列表</span>
-    </el-menu-item>
-    <el-menu-item index="/course-manage/audit" class="menu-item">
-      <span>审核管理</span>
-    </el-menu-item>
-  </el-sub-menu>
-  
-  <!-- 会议管理下拉菜单 -->
-  <el-sub-menu index="meeting-manage">
-    <template #title>
-      <el-icon><Calendar /></el-icon>
-      <span>会议管理</span>
-    </template>
-    <el-menu-item index="/meeting-manage/create" class="menu-item">
-      <span>创建会议</span>
-    </el-menu-item>
-    <el-menu-item index="/meeting-manage/list" class="menu-item">
-      <span>会议列表</span>
-    </el-menu-item>
-    <el-menu-item index="/meeting-manage/audit" class="menu-item">
-      <span>审核管理</span>
-    </el-menu-item>
-  </el-sub-menu>
-</el-menu>
+				   <!-- 行业动态下拉菜单 -->
+				   <el-sub-menu index="industryDynamic">
+					 <template #title>
+					   <el-icon><DataBoard /></el-icon>
+					   <span>行业动态</span>
+					 </template>
+					 <el-menu-item index="/userhome/industrydynamic/publish" class="menu-item">
+					   <span>发布动态</span>
+					 </el-menu-item>
+					 <el-menu-item index="/userhome/industrydynamic/list" class="menu-item">
+					   <span>动态列表</span>
+					 </el-menu-item>
+				   </el-sub-menu>
 		
-		
+				  <!-- 课程管理下拉菜单 -->
+				  <el-sub-menu index="course-manage">
+					<template #title>
+					  <el-icon><Collection /></el-icon>
+					  <span>课程管理</span>
+					</template>
+					<el-menu-item index="/userhome/coursemanage/add" class="menu-item">
+					  <span>添加课程</span>
+					</el-menu-item>
+					<el-menu-item index="/userhome/coursemanage/list" class="menu-item">
+					  <span>课程列表</span>
+					</el-menu-item>
+					<el-menu-item index="/userhome/coursemanage/audit" class="menu-item">
+					  <span>审核管理</span>
+					</el-menu-item>
+				  </el-sub-menu>
+				  
+				  <!-- 会议管理下拉菜单 -->
+				  <el-sub-menu index="meeting-manage">
+					<template #title>
+					  <el-icon><Calendar /></el-icon>
+					  <span>会议管理</span>
+					</template>
+					<el-menu-item index="/userhome/meetingmanage/create" class="menu-item">
+					  <span>创建会议</span>
+					</el-menu-item>
+					<el-menu-item index="/userhome/meetingmanage/list" class="menu-item">
+					  <span>会议列表</span>
+					</el-menu-item>
+					<el-menu-item index="/userhome/meetingmanage/audit" class="menu-item">
+					  <span>审核管理</span>
+					</el-menu-item>
+				  </el-sub-menu>
+				</el-menu>
+				
+				
       </aside>
 
       <!-- 右侧Main -->

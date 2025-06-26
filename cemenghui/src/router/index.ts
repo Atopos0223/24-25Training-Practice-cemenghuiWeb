@@ -18,7 +18,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/RegisterView.vue'),
   },
   {
-    path: '/user-home',
+    path: '/userhome',
     name: 'userhome',
     component: () => import('../views/UserHome.vue'),
     children: [
@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '查看信息', defaultTab: 'view' }
       },
       {
-        path: 'industry-dynamic', // 去掉开头的 /
+        path: 'industrydynamic', // 去掉开头的 /
         name: 'industrydynamic',
         children: [
           {
@@ -63,7 +63,7 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        path: 'course-manage', // 去掉开头的 /
+        path: 'coursemanage', // 去掉开头的 /
         name: 'coursemanage',
         children: [
           {
@@ -91,7 +91,7 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        path: 'meeting-manage', // 去掉开头的 /
+        path: 'meetingmanage', // 去掉开头的 /
         name: 'meetingmanage',
         children: [
           {
@@ -125,19 +125,6 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
-});
-
-router.beforeEach((to, _from, next) => {
-  const token = localStorage.getItem('token');
-  const publicPaths = ['/', '/login', '/register'];
-
-  if (!token && !publicPaths.includes(to.path)) {
-    next('/login');
-  } else if (token && (to.path === '/login' || to.path === '/register')) {
-    next('/user-home');
-  } else {
-    next();
-  }
 });
 
 export default router;
