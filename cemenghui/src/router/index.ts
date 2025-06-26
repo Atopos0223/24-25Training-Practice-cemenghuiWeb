@@ -129,6 +129,7 @@ const routes: RouteRecordRaw[] = [
       meta: { title: '创建会议' }
     },
     {
+<<<<<<< 刘翔
       path: 'list',
       component: () => import('@/views/user/MeetingList.vue'),
       meta: { title: '会议列表' }
@@ -176,5 +177,18 @@ router.beforeEach((to, _from, next) => {
     next(); // 正常访问
   }
 });
+=======
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LoginView.vue'),
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('../views/RegisterView.vue'),
+    },
+  ],
+})
+>>>>>>> main
 
 export default router;
