@@ -13,6 +13,12 @@ const router = createRouter({
 		path:'/adminHomeView',
 		name:'adminhome',
 		component: () => import('../views/AdminHomeView.vue'),
+	},
+	{
+	  path: '/info-management',
+	  name: 'InfoManagement',
+	  component: () => import('../views/InfoManagementView.vue'),
+	  meta: { requiresAdmin: true }
 	}
   ],
 })
