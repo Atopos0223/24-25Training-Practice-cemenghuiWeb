@@ -2,7 +2,7 @@ package com.example.cemenghui_web.entity;
 
 public class User {
     private Integer id;
-    private Integer company_id;
+    private String company;
     private String username;
     private String password;
     private String nickname;
@@ -20,12 +20,12 @@ public class User {
         this.id = id;
     }
 
-    public Integer getCompany_id() {
-        return company_id;
+    public String getCompany() {
+        return company;
     }
 
-    public void setCompany_id(Integer company_id) {
-        this.company_id = company_id;
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public String getUsername() {
@@ -96,7 +96,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", company_id=" + company_id +
+                ", company_id=" + company +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +

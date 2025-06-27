@@ -25,4 +25,12 @@ public class UserController {
         }
     }
 
+    @PostMapping("/register")
+    public Result<?> register(@RequestBody User user) {
+        if (userService.findByUsername(user.getUsername()) != null) {
+            return Result.error(400, "用户名已存在");
+        }
+        userService.register(user);
+        return Result.success();
+    }
 }
