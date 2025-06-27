@@ -150,20 +150,7 @@ const SUPER_ADMIN = {
   profileUrl: 'https://picsum.photos/200/200?random=1'
 };
 
-onMounted(() => {
-  // 模拟从 localStorage 取用户
-  user.value = localStorage.getItem('user') 
-    ? JSON.parse(localStorage.getItem('user')!) 
-    : SUPER_ADMIN;
-    
-  activeMenu.value = route.path;
-  
-  // 权限校验
-  if (!user.value || user.value.role !== 'superAdmin') {
-    ElMessage.error('无权限访问');
-    router.push('/login');
-  }
-});
+
 
 // 监听路由变化，更新激活菜单
 watchEffect(() => {

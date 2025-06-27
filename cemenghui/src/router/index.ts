@@ -1,28 +1,29 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-	
-	  {
-	    path: '/',
-	    redirect: '/login' // 或 '/login'，根据业务需求
-	  },
-	  
+  {
+    path: '/',
+    redirect: '/login'
+  },
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue'),
   },
   {
-		path:'/adminHomeView',
-		name:'adminhome',
-		component: () => import('../views/AdminHomeView.vue'),
-	},
-	{
-	  path: '/info-management',
-	  name: 'InfoManagement',
-	  component: () => import('../views/InfoManagementView.vue'),
-	  meta: { requiresAdmin: true }
-	},
+    path: '/adminhome',
+    name: 'adminhome',
+    component: () => import('../views/AdminHomeView.vue'),
+	children: [
+	  {
+	    path: '/info-management',
+	    name: 'InfoManagement',
+	    component: () => import('../views/InfoManagementView.vue'),
+	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
+	  },
+	]
+  },
+  
   {
     path: '/register',
     name: 'register',
@@ -52,7 +53,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '查看信息', defaultTab: 'view' }
       },
       {
-        path: 'industrydynamic', // 去掉开头的 /
+        path: 'industrydynamic',
         name: 'industrydynamic',
         children: [
           {
@@ -74,7 +75,7 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        path: 'coursemanage', // 去掉开头的 /
+        path: 'coursemanage',
         name: 'coursemanage',
         children: [
           {
@@ -102,7 +103,7 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        path: 'meetingmanage', // 去掉开头的 /
+        path: 'meetingmanage',
         name: 'meetingmanage',
         children: [
           {
@@ -130,10 +131,14 @@ const routes: RouteRecordRaw[] = [
         ]
       }
     ]
-  }
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+});
+
+// 移除了全局前置守卫，不再进行权限验证
 
 export default router;
