@@ -13,6 +13,17 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/LoginView.vue'),
   },
   {
+		path:'/adminHomeView',
+		name:'adminhome',
+		component: () => import('../views/AdminHomeView.vue'),
+	},
+	{
+	  path: '/info-management',
+	  name: 'InfoManagement',
+	  component: () => import('../views/InfoManagementView.vue'),
+	  meta: { requiresAdmin: true }
+	},
+  {
     path: '/register',
     name: 'register',
     component: () => import('../views/RegisterView.vue'),
@@ -124,7 +135,5 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
-});
 
 export default router;
