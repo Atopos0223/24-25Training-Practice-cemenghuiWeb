@@ -1,7 +1,6 @@
 <template>
   <div class="add-course">
-    <el-button @click="router.back()">返回</el-button>
-    
+ 
     <el-form :model="form" label-width="120px">
       <el-form-item label="课程名称">
         <el-input v-model="form.name" />
