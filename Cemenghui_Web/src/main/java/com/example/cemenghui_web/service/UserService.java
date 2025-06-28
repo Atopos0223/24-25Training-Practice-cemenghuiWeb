@@ -22,4 +22,20 @@ public class UserService {
     public User findByUsername(String username) {
         return userMapper.findByUsername(username);
     }
+    
+    public void updateUser(User user) {
+        userMapper.updateUser(user);
+    }
+    
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        // 先验证旧密码是否正确
+        User user = userMapper.findByUsername(username);
+        if (user == null || !user.getPassword().equals(oldPassword)) {
+            return false;
+        }
+        
+        // 更新密码
+        userMapper.updatePassword(username, newPassword);
+        return true;
+    }
 }
