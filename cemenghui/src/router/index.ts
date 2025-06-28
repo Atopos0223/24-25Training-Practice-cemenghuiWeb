@@ -21,6 +21,11 @@ const routes: RouteRecordRaw[] = [
 	    component: () => import('../views/InfoManagementView.vue'),
 	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
 	  },
+	  {
+        path: '/manage-dynamics',
+        component: () => import('@/views/admin/DynamicList.vue'),
+        meta: { title: '动态列表' }
+      },
 	]
   },
   
