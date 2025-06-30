@@ -1,5 +1,6 @@
 package com.example.cemenghui_web.mapper;
 
+import com.example.cemenghui_web.entity.News;
 import com.example.cemenghui_web.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,4 +38,6 @@ public interface UserMapper {
      */
     @Update("UPDATE \"user\" SET \"password\" = #{newPassword} WHERE \"username\" = #{username}")
     void updatePassword(@Param("username") String username, @Param("newPassword") String newPassword);
+
+
 }
