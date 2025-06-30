@@ -31,7 +31,10 @@ const audits = ref([
     id: 1,
     name: 'Python数据分析',
     author: '李老师',
-    status: '审核中'
+    status: '审核中',
+    intro: '本课程介绍Python在数据分析中的应用，包括pandas、numpy等库的使用。',
+    coverUrl: '/src/assets/logo.svg',
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4'
   }
 ])
 
@@ -40,7 +43,10 @@ const getStatusTagType = (status: string) => {
 }
 
 const viewDetail = (item: any) => {
-  // 查看详情逻辑
+  router.push({
+    path: `coursemanage/detail/${item.id}`,
+    query: { course: JSON.stringify(item) }
+  })
 }
 
 const approve = (item: any) => {

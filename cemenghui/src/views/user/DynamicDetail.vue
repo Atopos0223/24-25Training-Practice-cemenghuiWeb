@@ -1,6 +1,6 @@
 <template>
   <div class="dynamic-detail">
-    <el-button @click="router.push('/industry-dynamic/list')">
+    <el-button @click="router.push('/userhome/industrydynamic/list')">
       <el-icon><ArrowLeft /></el-icon>
       返回列表
     </el-button>

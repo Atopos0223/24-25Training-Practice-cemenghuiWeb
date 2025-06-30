@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import router from '@/router'
 
 const allAudits = ref([
   {
@@ -135,10 +136,9 @@ const rejectAudit = (id: number) => {
   loadAudits()
 }
 
-const viewDetail = (id: number) => {
-  // 这里可以用 router.push 跳转到详情页
-  alert('查看会议ID: ' + id)
-}
+const viewDetail = (id: any) => {
+  router.push(`/userhome/meetingmanage/detail/${id}`);
+};
 
 onMounted(() => {
   loadAudits()
