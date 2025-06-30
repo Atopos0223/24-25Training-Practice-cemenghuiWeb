@@ -22,10 +22,57 @@ const routes: RouteRecordRaw[] = [
 	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
 	  },
 	  {
+        path: '/permission-management',
+        name: 'PermissionManagement',
+        component: () => import('@/views/admin/PermissionManagement.vue'),
+        meta: { title: '权限管理' }
+      },
+	  {
+        path: '/audit-news',
+        name: 'AuditNews',
+        component: () => import('@/views/admin/AuditNews.vue'),
+        meta: { title: '审核资讯' }
+      },
+	  {
+        path: '/audit-courses',
+        name: 'AuditCourses',
+        component: () => import('@/views/admin/AuditCourses.vue'),
+        meta: { title: '审核课程' }
+      },
+	  {
+        path: '/audit-meetings',
+        name: 'AuditMeetings',
+        component: () => import('@/views/admin/AuditMeetings.vue'),
+        meta: { title: '审核会议' }
+      },
+	  {
+        path: '/create-meeting',
+        name: 'CreateMeeting',
+        component: () => import('@/views/admin/CreateMeeting.vue'),
+        meta: { title: '创建会议' }
+      },
+	  {
+        path: '/personal-center',
+        name: 'PersonalCenter',
+        component: () => import('@/views/admin/PersonalCenter.vue'),
+        meta: { title: '个人中心' }
+      },
+	  {
         path: '/manage-dynamics',
         component: () => import('@/views/admin/DynamicList.vue'),
         meta: { title: '动态列表' }
       },
+	  {
+	    path: '/manage-courses',
+	    component: () => import('@/views/admin/CourseList.vue'),
+	    meta: { title: '课程列表' }
+	  },
+	  {
+	    path: '/manage-meetings',
+	    component: () => import('@/views/admin/MeetingList.vue'),
+	    meta: { title: '会议列表' }
+	  },
+	  
 	]
   },
   
