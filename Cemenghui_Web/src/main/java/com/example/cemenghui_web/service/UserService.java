@@ -38,4 +38,19 @@ public class UserService {
         userMapper.updatePassword(username, newPassword);
         return true;
     }
+
+    /**
+     * 找回密码：根据用户名和手机号校验，正确则重置密码
+     */
+    public boolean findPassword(String username, String phone, String newPassword) {
+        User user = userMapper.findByUsername(username);
+        if (user == null) {
+            return false;
+        }
+        if (!user.getPhone().equals(phone)) {
+            return false;
+        }
+        userMapper.updatePassword(username, newPassword);
+        return true;
+    }
 }

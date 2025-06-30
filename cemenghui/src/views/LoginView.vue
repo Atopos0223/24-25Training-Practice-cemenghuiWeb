@@ -20,6 +20,9 @@
             <el-button type="text" size="large" @click="handleRegister">注册</el-button>
           </el-form-item>
         </el-form>
+        <div class="forgot-password-link">
+          <a @click="handleFindPassword" style="cursor:pointer; color:#409EFF;">忘记密码？</a>
+        </div>
       </el-card>
     </div>
   </div>
@@ -100,13 +103,19 @@ export default defineComponent({
       router.push('/register');
     };
 
+    // 处理找回密码
+    const handleFindPassword = () => {
+      router.push('/find-password');
+    };
+
     return {
       uname,
       upwd,
       loading,
       loginForm,
       handleLogin,
-      handleRegister
+      handleRegister,
+      handleFindPassword
     };
   }
 });
@@ -191,5 +200,10 @@ export default defineComponent({
   .background {
     filter: blur(2px);
   }
+}
+
+.forgot-password-link {
+  text-align: right;
+  margin-top: 8px;
 }
 </style>

@@ -190,6 +190,11 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
+  {
+    path: '/find-password',
+    name: 'findPassword',
+    component: () => import('../views/FindPassword.vue'),
+  },
 ];
 
 const router = createRouter({
