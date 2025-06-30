@@ -11,9 +11,15 @@ export default defineConfig({
     vueDevTools(),
   ],
   server: {
-    host: 'localhost', // 或 '0.0.0.0'，看需求
+    host: 'localhost', // 或 '0.0.0.0', 看需求
     port: 5173,
-    open: true // 启动时自动开浏览器，方便测试
+    open: true, // 启动时自动打开浏览器，方便测试
+    proxy: {
+      '/findPassword': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      }
+    }
   },
    css: {
       postcss: undefined // 关闭 PostCSS 处理

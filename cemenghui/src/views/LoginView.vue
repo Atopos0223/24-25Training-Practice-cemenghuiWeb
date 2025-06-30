@@ -20,6 +20,9 @@
             <el-button type="text" size="large" @click="handleRegister">注册</el-button>
           </el-form-item>
         </el-form>
+        <div class="forgot-password-link">
+          <a @click="handleFindPassword" style="cursor:pointer; color:#409EFF;">忘记密码？</a>
+        </div>
       </el-card>
     </div>
   </div>
@@ -61,7 +64,20 @@ export default defineComponent({
         console.log('res.data.code:', res.data.code);
         
         if (res.data && res.data.code === 200) {
-          if (res.data.data.is_super === 1) {  // 注意：可能需要访问 res.data.data
+          // 存储用户信息到localStorage
+          const userData = res.data.data;
+          localStorage.setItem('userInfo', JSON.stringify({
+            id: userData.id,
+            username: userData.username,
+            nickname: userData.nickname || userData.username,
+            phone: userData.phone || '',
+            email: userData.email || '',
+            gender: userData.gender === 1 ? '男' : userData.gender === 2 ? '女' : '男',
+            is_super: userData.is_super,
+            company: userData.company || ''
+          }));
+          
+          if (userData.is_super === 1) {  // 注意：可能需要访问 res.data.data
             router.push('/adminhome');
           } else {
             router.push('/userhome'); 
@@ -87,13 +103,19 @@ export default defineComponent({
       router.push('/register');
     };
 
+    // 处理找回密码
+    const handleFindPassword = () => {
+      router.push('/find-password');
+    };
+
     return {
       uname,
       upwd,
       loading,
       loginForm,
       handleLogin,
-      handleRegister
+      handleRegister,
+      handleFindPassword
     };
   }
 });
@@ -178,5 +200,10 @@ export default defineComponent({
   .background {
     filter: blur(2px);
   }
+}
+
+.forgot-password-link {
+  text-align: right;
+  margin-top: 8px;
 }
 </style>
