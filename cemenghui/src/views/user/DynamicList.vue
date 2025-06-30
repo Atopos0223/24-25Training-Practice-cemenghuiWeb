@@ -8,7 +8,7 @@
       />
       <el-button 
         type="primary" 
-        @click="router.push('/industry-dynamic/publish')"
+        @click="router.push('/userhome/industrydynamic/publish')"
       >
         发布新动态
       </el-button>
@@ -73,7 +73,7 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 // 定义方法
 const viewDetail = (id: any) => {
-  router.push(`/industry-dynamic/detail/1`);
+  router.push(`/userhome/industrydynamic/detail/${id}`);
 };
 
 const data = ref<Dynamic[]>([
@@ -102,7 +102,7 @@ const filteredData = computed(() => {
 
 const editItem = (row: Dynamic) => {
   router.push({
-    path: '/industry-dynamic/publish',
+    path: '/userhome/industrydynamic/publish',
     query: { editId: row.id }
   })
 }

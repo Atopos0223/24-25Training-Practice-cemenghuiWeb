@@ -74,7 +74,7 @@ const viewDetail = (course: any) => {
 }
 
 const editCourse = (course: any) => {
-  router.push(`/course-manage/edit/${course.id}`)
+  router.push(`/userhome/coursemanage/edit/${course.id}`)
 }
 
 const deleteCourse = (id: number) => {
@@ -82,11 +82,11 @@ const deleteCourse = (id: number) => {
 }
 
 const goToAdd = () => {
-  router.push('/course-manage/add')
+  router.push('/userhome/coursemanage/add')
 }
 
 const goToAudit = () => {
-  router.push('/course-manage/audit')
+  router.push('/userhome/coursemanage/audit')
 }
 </script>
 

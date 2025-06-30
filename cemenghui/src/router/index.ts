@@ -151,6 +151,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/user/EditCourse.vue'),
             meta: { title: '编辑' },
             props: true
+          },
+          {
+            path: 'detail/:id',
+            component: () => import('@/views/user/CourseDetail.vue'),
+            meta: { title: '课程详情' },
+            props: true
           }
         ]
       },
@@ -183,6 +189,11 @@ const routes: RouteRecordRaw[] = [
         ]
       }
     ]
+  },
+  {
+    path: '/find-password',
+    name: 'findPassword',
+    component: () => import('../views/FindPassword.vue'),
   },
 ];
 

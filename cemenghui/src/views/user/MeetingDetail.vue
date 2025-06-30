@@ -1,5 +1,10 @@
 <template>
   <div class="meeting-detail">
+	  <el-button @click="$router.push('/userhome/meetingmanage/list')">
+	    <el-icon><ArrowLeft /></el-icon>
+	    返回列表
+	  </el-button>
+	  
     <el-card v-if="meeting">
       <h3>{{ meeting.name }}</h3>
       <el-descriptions column="2" border>
@@ -29,8 +34,8 @@ const mockMeetings = [
     startTime: '2025-06-30T09:00:00',
     endTime: '2025-06-30T11:30:00',
     creator: '王主任',
-    content: '讨论第二季度教学成果和第三季度教学计划...',
-    status: '已发布'
+    content: '讨论第二季度教学成果和第三季度教学计划，包括课程改进、教学方法优化等内容。',
+    status: '审核中'
   },
   {
     id: 2,
@@ -38,8 +43,17 @@ const mockMeetings = [
     startTime: '2025-07-10T14:00:00',
     endTime: '2025-07-10T16:00:00',
     creator: '李老师',
-    content: '讨论职业教育新课程开发方案...',
-    status: '未审核'
+    content: '讨论职业教育新课程开发方案，制定课程大纲和教学计划。',
+    status: '已通过'
+  },
+  {
+    id: 3,
+    name: '新课程评审会',
+    startTime: '2025-07-15T10:00:00',
+    endTime: '2025-07-15T12:00:00',
+    creator: '张老师',
+    content: '评审新开发的课程内容，确保教学质量和课程标准的符合性。',
+    status: '未通过'
   }
 ]
 

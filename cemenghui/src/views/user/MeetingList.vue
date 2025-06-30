@@ -147,12 +147,12 @@ const filterMeetings = () => {
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/meeting-manage/detail/${id}`)
+  router.push(`/userhome/meetingmanage/detail/${id}`)
 }
 
 const editMeeting = (row: any) => {
   router.push({
-    path: '/meeting-manage/create',
+    path: '/userhome/meetingmanage/create',
     query: { id: row.id }
   })
 }
@@ -163,7 +163,7 @@ const deleteMeeting = (id: number) => {
 }
 
 const goToCreate = () => {
-  router.push('/meeting-manage/create')
+  router.push('/userhome/meetingmanage/create')
 }
 </script>
 

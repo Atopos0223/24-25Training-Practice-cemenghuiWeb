@@ -10,6 +10,9 @@
       <el-form-item label="邮箱">
         <el-input v-model="form.email"></el-input>
       </el-form-item>
+      <el-form-item label="公司">
+        <el-input v-model="form.company"></el-input>
+      </el-form-item>
       <el-form-item label="性别">
         <el-radio-group v-model="form.gender">
           <el-radio label="男">男</el-radio>
@@ -24,18 +27,67 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
 
 const form = reactive({
+  id: '',
+  username: '',
   nickname: '',
   phone: '',
   email: '',
+  company: '',
   gender: '男'
 })
 
-const submit = () => {
-  console.log('保存基本信息:', form)
-  // 调用API保存数据
+onMounted(() => {
+  // 从localStorage获取用户信息
+  const userInfoStr = localStorage.getItem('userInfo')
+  if (userInfoStr) {
+    const userInfo = JSON.parse(userInfoStr)
+    Object.assign(form, userInfo)
+  }
+})
+
+const submit = async () => {
+  try {
+    // 准备发送给后端的数据
+    const updateData = {
+      id: form.id,
+      nickname: form.nickname,
+      phone: form.phone,
+      email: form.email,
+      company: form.company,
+      // 将性别转换为数字格式
+      gender: form.gender === '男' ? 1 : form.gender === '女' ? 2 : 1
+    }
+    
+    // 调用后端API更新用户信息
+    const response = await axios.post('http://localhost:8080/updateUser', updateData)
+    
+    if (response.data && response.data.code === 200) {
+      // 更新localStorage中的用户信息
+      const userInfoStr = localStorage.getItem('userInfo')
+      if (userInfoStr) {
+        const userInfo = JSON.parse(userInfoStr)
+        const updatedUserInfo = { 
+          ...userInfo, 
+          ...form,
+          // 将性别转换为数字格式
+          gender: form.gender === '男' ? 1 : form.gender === '女' ? 2 : 1
+        }
+        localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo))
+      }
+      
+      ElMessage.success('基本信息保存成功！')
+    } else {
+      ElMessage.error(response.data?.message || '保存失败')
+    }
+  } catch (error) {
+    console.error('保存失败:', error)
+    ElMessage.error('网络错误，请稍后重试')
+  }
 }
 </script>
 
