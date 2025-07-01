@@ -185,6 +185,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/user/MeetingDetail.vue'),
             meta: { title: '会议详情' },
             props: true
+          },
+          {
+            path: 'edit',
+            component: () => import('@/views/user/EditMeeting.vue'),
+            meta: { title: '编辑会议' }
           }
         ]
       }
