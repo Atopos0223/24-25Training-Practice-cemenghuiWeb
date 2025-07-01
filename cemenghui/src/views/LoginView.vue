@@ -76,6 +76,7 @@ export default defineComponent({
             is_super: userData.is_super,
             company: userData.company || ''
           }));
+          localStorage.setItem('userId', userData.id);
           
           if (userData.is_super === 1) {  // 注意：可能需要访问 res.data.data
             router.push('/adminhome');
