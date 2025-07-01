@@ -3,6 +3,9 @@ package com.example.cemenghui_web.mapper;
 import com.example.cemenghui_web.entity.News;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface NewsMapper {
@@ -14,4 +17,6 @@ public interface NewsMapper {
             "#{status}, #{createTime}, #{updateTime})")
     boolean addNews(News news);
 
+    @Select("SELECT * FROM news")
+    List<News> getAllNews();
 }

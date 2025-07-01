@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PublicKey;
+import java.util.List;
 
 @Service
 public class NewsService {
@@ -14,5 +15,9 @@ public class NewsService {
 
     public boolean addNews(News news){
         return newsMapper.addNews(news);
+    }
+
+    public List<News> getAllNews(){
+        return newsMapper.getAllNews();
     }
 }

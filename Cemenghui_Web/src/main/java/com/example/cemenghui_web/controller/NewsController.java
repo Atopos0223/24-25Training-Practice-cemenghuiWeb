@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.interfaces.RSAKey;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -28,4 +29,13 @@ public class NewsController {
         }
     }
 
+    @PostMapping("/getAllNews")
+    public Result<List> getAllNews(){
+        List<News> allNews = newsService.getAllNews();
+        if(allNews != null){
+            return Result.success(allNews);
+        }else{
+            return Result.error(404,"获取失败");
+        }
+    }
 }
