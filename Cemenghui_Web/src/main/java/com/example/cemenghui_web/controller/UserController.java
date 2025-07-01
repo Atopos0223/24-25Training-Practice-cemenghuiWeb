@@ -30,4 +30,49 @@ public class UserController {
         userService.register(user);
         return Result.success();
     }
+    
+    @PostMapping("/updateUser")
+    public Result<?> updateUser(@RequestBody User user) {
+        try {
+            userService.updateUser(user);
+            return Result.success();
+        } catch (Exception e) {
+            return Result.error(500, "更新用户信息失败: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/updatePassword")
+    public Result<?> updatePassword(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            String oldPassword = request.get("oldPassword");
+            String newPassword = request.get("newPassword");
+            
+            boolean success = userService.updatePassword(username, oldPassword, newPassword);
+            if (success) {
+                return Result.success();
+            } else {
+                return Result.error(400, "旧密码错误或用户不存在");
+            }
+        } catch (Exception e) {
+            return Result.error(500, "修改密码失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/findPassword")
+    public Result<?> findPassword(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            String phone = request.get("phone");
+            String newPassword = request.get("newPassword");
+            boolean success = userService.findPassword(username, phone, newPassword);
+            if (success) {
+                return Result.success();
+            } else {
+                return Result.error(400, "用户名或手机号不正确");
+            }
+        } catch (Exception e) {
+            return Result.error(500, "找回密码失败: " + e.getMessage());
+        }
+    }
 }
