@@ -1,6 +1,5 @@
 package com.example.cemenghui_web.mapper;
 
-import com.example.cemenghui_web.entity.News;
 import com.example.cemenghui_web.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
