@@ -9,7 +9,7 @@ import java.util.List;
 public interface CourseMapper {
 
     // 使用双引号包裹字段名（与UserMapper风格一致）
-    @Insert("INSERT INTO \"course\" (\"title\", \"author\", \"coverUrl\", \"intro\", \"videoUrl\", \"status\", \"create_time\") " +
+    @Insert("INSERT INTO \"course\" (\"title\", \"author\", \"coverUrl\", \"intro\", \"videoUrl\", \"status\", \"createTime\") " +
             "VALUES (#{title}, #{author}, #{coverUrl}, #{intro}, #{videoUrl}, #{status}, NOW())")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertCourse(Course course);
@@ -17,7 +17,7 @@ public interface CourseMapper {
     @Select("SELECT * FROM course WHERE id = #{id}")
     Course selectById(@Param("id") Long id);
 
-    @Select("SELECT * FROM \"course\" ORDER BY \"create_time\" DESC")
+    @Select("SELECT * FROM \"course\" ORDER BY \"createTime\" DESC")
     List<Course> selectAllCourses();
 
     List<Course> listAll();
