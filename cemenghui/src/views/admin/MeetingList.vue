@@ -66,28 +66,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
 
 const router = useRouter()
 
-// mock 数据
-const allMeetings = ref([
-  {
-    id: 1,
-    name: '2025年第二季度教学研讨会',
-    startTime: '2025-06-30T09:00:00',
-    location: '会议室A',
-    status: '已发布'
-  },
-  {
-    id: 2,
-    name: '职业教育课程开发会议',
-    startTime: '2025-07-10T14:00:00',
-    location: '会议室B',
-    status: '未审核'
-  }
-])
+const allMeetings = ref([])
 
 const searchParams = reactive({
   name: '',
@@ -165,6 +150,20 @@ const deleteMeeting = (id: number) => {
 const goToCreate = () => {
   router.push('/meeting-manage/create')
 }
+
+const fetchMeetings = async () => {
+  const res = await request.get('/api/meeting/list')
+  if (res.data && res.data.code === 200) {
+    allMeetings.value = res.data.data.map(item => ({
+      ...item,
+      name: item.title // 字段映射，兼容表格 prop="name"
+    }))
+  }
+}
+
+onMounted(() => {
+  fetchMeetings()
+})
 </script>
 
 <style scoped>

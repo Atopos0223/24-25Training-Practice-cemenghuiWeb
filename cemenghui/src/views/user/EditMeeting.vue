@@ -1,8 +1,8 @@
 <template>
-  <div class="create-meeting">
-    <el-form :model="form" label-width="120px" :rules="rules" ref="formRef">
-      <el-form-item label="会议名称" prop="name">
-        <el-input v-model="form.name" placeholder="请输入会议名称"></el-input>
+  <div class="edit-meeting">
+    <el-form :model="form" label-width="120px" ref="formRef">
+      <el-form-item label="会议名称" prop="title">
+        <el-input v-model="form.title" placeholder="请输入会议名称"></el-input>
       </el-form-item>
       <el-form-item label="开始时间" prop="startTime">
         <el-date-picker
@@ -35,7 +35,7 @@
         <el-input v-model="form.cover" placeholder="请输入会议封面URL"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-button type="primary" @click="submitForm">保存修改</el-button>
         <el-button @click="resetForm">重置</el-button>
       </el-form-item>
     </el-form>
@@ -43,17 +43,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
 import request from '@/utils/request'
 
+const route = useRoute()
 const router = useRouter()
-
-const formRef = ref<FormInstance>()
+const formRef = ref()
 const form = reactive({
-  name: '',
+  id: '',
+  title: '',
   startTime: '',
   endTime: '',
   location: '',
@@ -61,40 +61,23 @@ const form = reactive({
   cover: ''
 })
 
-const rules = reactive<FormRules>({
-  name: [{ required: true, message: '请输入会议名称', trigger: 'blur' }],
-  startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
-  endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
-  content: [{ required: true, message: '请输入会议内容', trigger: 'blur' }]
+onMounted(async () => {
+  const id = route.query.id
+  if (id) {
+    const res = await request.get(`/api/meeting/detail/${id}`)
+    if (res.data && res.data.code === 200) {
+      Object.assign(form, res.data.data)
+    }
+  }
 })
 
-const currentUserId = Number(localStorage.getItem('userId'))
-
 const submitForm = async () => {
-  if (!formRef.value) return
-  try {
-    await formRef.value.validate()
-    // 调用后端创建会议接口
-    const res = await request.post('/api/meeting/create', {
-      title: form.name,
-      startTime: form.startTime,
-      endTime: form.endTime,
-      location: form.location,
-      content: form.content,
-      cover: form.cover,
-      creatorId: currentUserId,
-      createTime: new Date(),
-      status: 1
-    })
-    if (res.data && res.data.code === 200) {
-      ElMessage.success('会议创建成功')
-      router.back()
-    } else {
-      ElMessage.error(res.data?.message || '创建失败')
-    }
-  } catch (error) {
-    console.error('表单验证失败:', error)
-    ElMessage.error('创建失败')
+  const res = await request.put('/api/meeting/update', form)
+  if (res.data && res.data.code === 200) {
+    ElMessage.success('修改成功')
+    router.back()
+  } else {
+    ElMessage.error(res.data?.message || '修改失败')
   }
 }
 
@@ -104,9 +87,9 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-.create-meeting {
+.edit-meeting {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
-</style>
+</style> 
