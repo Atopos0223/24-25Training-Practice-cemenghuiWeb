@@ -1,5 +1,10 @@
 <template>
   <div class="meeting-detail">
+	  <el-button @click="$router.push('/userhome/meetingmanage/list')">
+	    <el-icon><ArrowLeft /></el-icon>
+	    返回列表
+	  </el-button>
+	  
     <el-card v-if="meeting">
       <h3>{{ meeting.name }}</h3>
       <el-descriptions column="2" border>

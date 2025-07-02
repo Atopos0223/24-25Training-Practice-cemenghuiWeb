@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Result;
 import java.util.List;
 
 @Mapper
@@ -27,4 +29,6 @@ public interface MeetingMapper {
 
     @Update("UPDATE meeting SET title=#{title}, content=#{content}, start_time=#{startTime}, end_time=#{endTime}, location=#{location}, cover=#{cover} WHERE id=#{id}")
     void updateMeeting(Meeting meeting);
+
+
 } 
