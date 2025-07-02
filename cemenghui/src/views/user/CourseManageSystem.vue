@@ -101,28 +101,7 @@
         </el-card>
       </el-tab-pane>
       
-      <el-tab-pane label="审核管理" name="audit">
-        <el-table :data="auditList" border style="width: 100%">
-          <el-table-column prop="name" label="课程名称"></el-table-column>
-          <el-table-column prop="author" label="作者"></el-table-column>
-          <el-table-column prop="submitTime" label="提交时间" width="120"></el-table-column>
-          <el-table-column prop="status" label="审核状态" width="120">
-            <template #default="{row}">
-              <el-tag :type="row.status === '未通过' ? 'danger' : row.status === '已通过' ? 'success' : 'warning'">
-                {{ row.status }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="200">
-            <template #default="scope">
-              <el-button type="primary" size="small" @click="viewCourse(scope.row)">查看</el-button>
-              <el-button type="warning" size="small" @click="editCourse(scope.row)" 
-                v-if="scope.row.status === '未通过'">重新编辑</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-    </el-tabs>
+ 
   </div>
 </template>
 

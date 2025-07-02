@@ -10,7 +10,7 @@
       <el-button type="primary" @click="loadAudits">筛选</el-button>
     </div>
     
-    <el-table :data="auditList" border style="width: 100%">
+    <el-table :data="allAudits" border style="width: 100%">
       <el-table-column prop="name" label="会议名称" width="180"/>
       <el-table-column prop="creator" label="提交人" width="120"/>
       <el-table-column prop="submitTime" label="提交时间" width="180">
@@ -21,7 +21,7 @@
       <el-table-column prop="status" label="审核状态" width="120">
         <template #default="{row}">
           <el-tag :type="statusTagType(row.status)">
-            {{ row.status }}
+            {{ statusText(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -58,32 +58,10 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import router from '@/router'
+import request from '@/utils/request'
 
-const allAudits = ref([
-  {
-    id: 1,
-    name: '2025年第二季度教学研讨会',
-    creator: '王主任',
-    submitTime: '2025-06-20T10:00:00',
-    status: '审核中'
-  },
-  {
-    id: 2,
-    name: '职业教育课程开发会议',
-    creator: '李老师',
-    submitTime: '2025-06-22T14:00:00',
-    status: '已通过'
-  },
-  {
-    id: 3,
-    name: '新课程评审会',
-    creator: '张老师',
-    submitTime: '2025-06-25T09:00:00',
-    status: '未通过'
-  }
-])
-
-const auditList = ref<any[]>([])
+const allAudits = ref([])
 const auditStatus = ref('')
 const pagination = reactive({
   current: 1,
@@ -120,7 +98,7 @@ const loadAudits = () => {
   pagination.total = result.length
   // 简单分页
   const startIdx = (pagination.current - 1) * pagination.size
-  auditList.value = result.slice(startIdx, startIdx + pagination.size)
+  allAudits.value = result.slice(startIdx, startIdx + pagination.size)
 }
 
 const approveAudit = (id: number) => {
@@ -135,12 +113,29 @@ const rejectAudit = (id: number) => {
   loadAudits()
 }
 
-const viewDetail = (id: number) => {
-  // 这里可以用 router.push 跳转到详情页
-  alert('查看会议ID: ' + id)
+const viewDetail = (id: any) => {
+  router.push(`/userhome/meetingmanage/detail/${id}`);
+};
+
+const statusText = (status: any) => {
+  if (status === 1) return '审核中'
+  if (status === 2) return '已通过'
+  if (status === 0) return '未通过'
+  return status
+}
+
+const fetchAudits = async () => {
+  const res = await request.get('/api/meeting/list')
+  if (res.data && res.data.code === 200) {
+    allAudits.value = res.data.data.map(item => ({
+      ...item,
+      name: item.title
+    }))
+  }
 }
 
 onMounted(() => {
+  fetchAudits()
   loadAudits()
 })
 </script>

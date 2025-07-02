@@ -8,7 +8,7 @@
       />
       <el-button 
         type="primary" 
-        @click="router.push('/userhome/industrydynamic/publish')"
+        @click="router.push('/publish')"
       >
         发布新动态
       </el-button>
@@ -16,28 +16,28 @@
 
     <el-table :data="filteredData" border>
       <el-table-column prop="title" label="标题" />
-      <el-table-column prop="author" label="作者ID" />
+      <el-table-column prop="author" label="作者" />
       <el-table-column prop="createTime" label="发布时间" />
       <el-table-column prop="status" label="状态" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button 
             type="text" 
-           @click="viewDetail(row.id)"
+            @click="viewDetail(row.id)"
           >
             查看
           </el-button>
           <el-button 
             type="text" 
             @click="editItem(row)"
-            v-if="row.status !== '已发布'"
+            v-if="row.create_id === userId && row.status !== '已发布'"
           >
             编辑
           </el-button>
           <el-button 
             type="text" 
             @click="deleteItem(row)"
-            v-if="row.status !== '已发布'"
+            v-if="row.create_id === userId && row.status !== '已发布'"
           >
             删除
           </el-button>
@@ -58,42 +58,32 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '@/utils/request'
 
 interface Dynamic {
   id: number
   title: string
-  author_id: number
+  author: string
   createTime: string
   status: string
+  create_id: number
 }
 
 const router = useRouter()
 const searchKey = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
+
+const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+const userId = userInfo.id
+
 const data = ref<Dynamic[]>([])
 
 onMounted(async () => {
-  try {
-    const res = await axios.get('http://localhost:8080/news/all')
-    // 字段映射处理
-    data.value = res.data.data.map((item: any) => ({
-      id: item.id,
-      title: item.title || '',
-      author_id: item.author_id || '未知', 
-      createTime: item.create_time || '',
-      status: item.status === 1 ? '已发布' : (item.status === 0 ? '审核中' : item.status)
-    }))
-  } catch (error) {
-    console.error('获取新闻失败', error)
-  }
+  const res = await request.get('http://localhost:8080/getAllNews')
+  // 假设返回的数据结构为 { data: [...] }
+  data.value = res.data
 })
-
-// 定义方法
-const viewDetail = (id: any) => {
-  router.push(`/userhome/industrydynamic/detail/${id}`);
-};
 
 const filteredData = computed(() => {
   return data.value.filter(item => 
@@ -102,9 +92,13 @@ const filteredData = computed(() => {
   )
 })
 
+const viewDetail = (id: any) => {
+  router.push(`/industry-dynamic/detail/${id}`);
+};
+
 const editItem = (row: Dynamic) => {
   router.push({
-    path: '/userhome/industrydynamic/publish',
+    path: '/industry-dynamic/publish',
     query: { editId: row.id }
   })
 }
