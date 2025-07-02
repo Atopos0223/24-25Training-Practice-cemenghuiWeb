@@ -16,7 +16,7 @@
 
     <el-table :data="filteredData" border>
       <el-table-column prop="title" label="标题" />
-      <el-table-column prop="author" label="作者" />
+      <el-table-column prop="author" label="作者ID" />
       <el-table-column prop="createTime" label="发布时间" />
       <el-table-column prop="status" label="状态" />
       <el-table-column label="操作" width="180">
@@ -56,13 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 interface Dynamic {
   id: number
   title: string
-  author: string
+  author_id: number
   createTime: string
   status: string
 }
@@ -71,27 +72,28 @@ const router = useRouter()
 const searchKey = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
+const data = ref<Dynamic[]>([])
+
+onMounted(async () => {
+  try {
+    const res = await axios.get('http://localhost:8080/news/all')
+    // 字段映射处理
+    data.value = res.data.data.map((item: any) => ({
+      id: item.id,
+      title: item.title || '',
+      author_id: item.author_id || '未知', 
+      createTime: item.create_time || '',
+      status: item.status === 1 ? '已发布' : (item.status === 0 ? '审核中' : item.status)
+    }))
+  } catch (error) {
+    console.error('获取新闻失败', error)
+  }
+})
+
 // 定义方法
 const viewDetail = (id: any) => {
   router.push(`/userhome/industrydynamic/detail/${id}`);
 };
-
-const data = ref<Dynamic[]>([
-  {
-    id: 1,
-    title: '行业最新动态：AI技术在教育领域的应用',
-    author: '张三',
-    createTime: '2025-06-15',
-    status: '已发布'
-  },
-  {
-    id: 2,
-    title: '职业教育发展趋势分析',
-    author: '李四',
-    createTime: '2025-06-10',
-    status: '审核中'
-  }
-])
 
 const filteredData = computed(() => {
   return data.value.filter(item => 

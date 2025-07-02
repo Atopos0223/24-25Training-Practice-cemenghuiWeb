@@ -38,9 +38,11 @@ public interface UserMapper {
     @Update("UPDATE \"user\" SET \"password\" = #{newPassword} WHERE \"username\" = #{username}")
     void updatePassword(@Param("username") String username, @Param("newPassword") String newPassword);
 
+
     /**
      * 根据用户ID查询用户
      */
     @Select("SELECT * FROM \"user\" WHERE \"id\" = #{id}")
     User getUserById(@Param("id") Integer id);
+
 }
