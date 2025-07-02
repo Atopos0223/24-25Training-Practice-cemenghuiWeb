@@ -13,6 +13,11 @@
           <el-tag :type="getStatusTagType(row.status)">{{ row.status }}</el-tag>
         </template>
       </el-table-column>
+	    <el-table-column prop="createTime" label="发布时间" width="180">
+	      <template #default="{row}">
+	        {{ formatDate(row.createTime) }}
+	      </template>
+	    </el-table-column>
       <el-table-column label="封面" width="120">
         <template #default="{row}">
           <div class="cover-container">
@@ -246,6 +251,14 @@ const previewVideo = (course: Course) => {
 const handleVideoError = () => {
   ElMessage.error('视频加载失败，请检查视频地址');
   currentVideoUrl.value = '';
+};
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-';
+  try {
+    return new Date(dateString).toLocaleString();
+  } catch {
+    return dateString; // 如果格式化失败，返回原始字符串
+  }
 };
 
 onMounted(() => {
