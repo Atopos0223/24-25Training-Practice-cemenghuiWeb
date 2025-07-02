@@ -127,8 +127,16 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'detail/:id',
+            name: 'DynamicDetail',
             component: () => import('@/views/user/DynamicDetail.vue'),
             meta: { title: '动态详情' },
+            props: true
+          },
+          {
+            path: 'edit/:id',
+            name: 'EditDynamic',
+            component: () => import('@/views/user/EditDynamic.vue'),
+            meta: { title: '编辑动态' },
             props: true
           }
         ]
