@@ -8,7 +8,7 @@
       />
       <el-button 
         type="primary" 
-        @click="router.push('/industry-dynamic/publish')"
+        @click="router.push('/publish')"
       >
         发布新动态
       </el-button>
@@ -23,21 +23,21 @@
         <template #default="{ row }">
           <el-button 
             type="text" 
-           @click="viewDetail(row.id)"
+            @click="viewDetail(row.id)"
           >
             查看
           </el-button>
           <el-button 
             type="text" 
             @click="editItem(row)"
-            v-if="row.status !== '已发布'"
+            v-if="row.create_id === userId && row.status !== '已发布'"
           >
             编辑
           </el-button>
           <el-button 
             type="text" 
             @click="deleteItem(row)"
-            v-if="row.status !== '已发布'"
+            v-if="row.create_id === userId && row.status !== '已发布'"
           >
             删除
           </el-button>
@@ -56,8 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
 
 interface Dynamic {
   id: number
@@ -65,33 +66,24 @@ interface Dynamic {
   author: string
   createTime: string
   status: string
+  create_id: number
 }
 
 const router = useRouter()
 const searchKey = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
-// 定义方法
-const viewDetail = (id: any) => {
-  router.push(`/industry-dynamic/detail/1`);
-};
 
-const data = ref<Dynamic[]>([
-  {
-    id: 1,
-    title: '行业最新动态：AI技术在教育领域的应用',
-    author: '张三',
-    createTime: '2025-06-15',
-    status: '已发布'
-  },
-  {
-    id: 2,
-    title: '职业教育发展趋势分析',
-    author: '李四',
-    createTime: '2025-06-10',
-    status: '审核中'
-  }
-])
+const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+const userId = userInfo.id
+
+const data = ref<Dynamic[]>([])
+
+onMounted(async () => {
+  const res = await request.get('http://localhost:8080/getAllNews')
+  // 假设返回的数据结构为 { data: [...] }
+  data.value = res.data
+})
 
 const filteredData = computed(() => {
   return data.value.filter(item => 
@@ -99,6 +91,10 @@ const filteredData = computed(() => {
     item.author.includes(searchKey.value)
   )
 })
+
+const viewDetail = (id: any) => {
+  router.push(`/industry-dynamic/detail/${id}`);
+};
 
 const editItem = (row: Dynamic) => {
   router.push({

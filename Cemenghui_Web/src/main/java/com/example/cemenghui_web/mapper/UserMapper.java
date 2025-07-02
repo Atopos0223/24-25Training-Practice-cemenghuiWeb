@@ -1,6 +1,5 @@
 package com.example.cemenghui_web.mapper;
 
-import com.example.cemenghui_web.entity.News;
 import com.example.cemenghui_web.entity.User;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -84,5 +83,11 @@ public interface UserMapper {
     // 更新用户状态（启用/禁用）
     @Update("UPDATE \"user\" SET \"status\" = #{status} WHERE \"id\" = #{id}")
     int updateUserStatus(@Param("id") Integer id, @Param("status") Integer status);
+
+    /**
+     * 根据用户ID查询用户
+     */
+    @Select("SELECT * FROM \"user\" WHERE \"id\" = #{id}")
+    User getUserById(@Param("id") Integer id);
 
 }

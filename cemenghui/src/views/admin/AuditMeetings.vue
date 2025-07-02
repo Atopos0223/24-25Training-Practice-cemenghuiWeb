@@ -23,9 +23,9 @@
     </div>
 
     <el-card>
-      <el-table :data="filteredMeetings" style="width: 100%" v-loading="loading">
+      <el-table :data="meetingList" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="会议名称" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="name" label="会议名称" min-width="200" show-overflow-tooltip />
         <el-table-column prop="organizer" label="组织者" width="120" />
         <el-table-column prop="meetingTime" label="会议时间" width="180" />
         <el-table-column prop="location" label="地点" width="150" />
@@ -78,7 +78,7 @@
     <el-dialog v-model="showDetailDialog" title="会议详情" width="800px">
       <div v-if="selectedMeeting" class="meeting-detail">
         <div class="detail-header">
-          <h3>{{ selectedMeeting.title }}</h3>
+          <h3>{{ selectedMeeting.name }}</h3>
           <div class="meta-info">
             <span>组织者：{{ selectedMeeting.organizer }}</span>
             <span>会议时间：{{ selectedMeeting.meetingTime }}</span>
@@ -131,6 +131,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
 // 响应式数据
 const loading = ref(false)
@@ -144,46 +145,7 @@ const showAuditDialog = ref(false)
 const selectedMeeting = ref(null)
 const auditAction = ref('')
 const auditFormRef = ref()
-
-// 会议数据
-const meetingList = ref([
-  {
-    id: 1,
-    title: '2025年测试技术交流会',
-    organizer: '张经理',
-    meetingTime: '2025-02-15 14:00-17:00',
-    location: '线上会议',
-    status: 'pending',
-    submitTime: '2025-01-15 10:30:00',
-    auditTime: '',
-    description: '本次会议将邀请行业专家分享最新的测试技术和实践经验，探讨测试行业的发展趋势。',
-    agenda: [
-      { time: '14:00-14:30', content: '开场致辞' },
-      { time: '14:30-15:30', content: 'AI在测试中的应用' },
-      { time: '15:30-16:30', content: '自动化测试最佳实践' },
-      { time: '16:30-17:00', content: '互动讨论' }
-    ],
-    auditComment: ''
-  },
-  {
-    id: 2,
-    title: '性能测试专题研讨会',
-    organizer: '李总监',
-    meetingTime: '2025-02-20 09:00-12:00',
-    location: '会议室A',
-    status: 'approved',
-    submitTime: '2025-01-14 15:20:00',
-    auditTime: '2025-01-15 09:00:00',
-    description: '深入探讨性能测试的方法论和工具使用，分享实际项目中的经验教训。',
-    agenda: [
-      { time: '09:00-09:30', content: '会议介绍' },
-      { time: '09:30-10:30', content: '性能测试策略' },
-      { time: '10:30-11:30', content: '工具使用演示' },
-      { time: '11:30-12:00', content: '总结讨论' }
-    ],
-    auditComment: '会议内容充实，安排合理'
-  }
-])
+const meetingList = ref([])
 
 // 审核表单
 const auditForm = reactive({
@@ -200,7 +162,7 @@ const filteredMeetings = computed(() => {
 
   if (searchKeyword.value) {
     filtered = filtered.filter(meeting => 
-      meeting.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+      meeting.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
       meeting.organizer.toLowerCase().includes(searchKeyword.value.toLowerCase())
     )
   }
@@ -275,8 +237,19 @@ const submitAudit = async () => {
   }
 }
 
+const fetchMeetings = async () => {
+  const res = await request.get('/api/meeting/list')
+  if (res.data && res.data.code === 200) {
+    meetingList.value = res.data.data.map(item => ({
+      ...item,
+      name: item.title
+    }))
+  }
+}
+
 // 生命周期
 onMounted(() => {
+  fetchMeetings()
   total.value = meetingList.value.length
 })
 </script>

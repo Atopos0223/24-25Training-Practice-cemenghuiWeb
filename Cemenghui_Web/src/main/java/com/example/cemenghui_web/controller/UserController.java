@@ -6,6 +6,7 @@ import com.example.cemenghui_web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public Result<?> register(@RequestBody User user) {
+    public Result register(@RequestBody User user) {
         if (userService.findByUsername(user.getUsername()) != null) {
             return Result.error(400, "用户名已存在");
         }

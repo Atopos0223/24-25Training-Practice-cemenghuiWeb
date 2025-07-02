@@ -55,6 +55,7 @@ public class UserService {
         return true;
     }
 
+
     // 新增用户
     public int insertUser(User user) {
         return userMapper.insertUser(user);
@@ -78,5 +79,8 @@ public class UserService {
     // 更新用户状态（启用/禁用）
     public int updateUserStatus(Integer id, Integer status) {
         return userMapper.updateUserStatus(id, status);
+    }
+    public User getUserById(Integer id) {
+        return userMapper.getUserById(id);
     }
 }

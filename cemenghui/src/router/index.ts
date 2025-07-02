@@ -15,6 +15,7 @@ const routes: RouteRecordRaw[] = [
     name: 'adminhome',
     component: () => import('../views/AdminHomeView.vue'),
 	children: [
+		
 	  {
 	    path: '/info-management',
 	    name: 'InfoManagement',
@@ -62,6 +63,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/DynamicList.vue'),
         meta: { title: '动态列表' }
       },
+	  {
+	    path: '/publish',
+	    name: 'InfoManagement',
+	    component: () => import('../views/user/PublishDynamic.vue'),
+	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
+	  },
 	  {
 	    path: '/manage-courses',
 	    component: () => import('@/views/admin/CourseList.vue'),
@@ -185,6 +192,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/user/MeetingDetail.vue'),
             meta: { title: '会议详情' },
             props: true
+          },
+          {
+            path: 'edit',
+            component: () => import('@/views/user/EditMeeting.vue'),
+            meta: { title: '编辑会议' }
           }
         ]
       }
