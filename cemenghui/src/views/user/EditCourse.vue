@@ -1,154 +1,193 @@
 <template>
-  <div class="course-edit">
-    <h2>编辑课程</h2>
-    <el-form 
-      v-if="course" 
-      :model="course" 
-      label-width="120px"
-      label-position="top"
-    >
-      <el-form-item label="课程名称" required>
-        <el-input v-model="course.name" placeholder="请输入课程名称" />
+  <div class="edit-course-container">
+    <el-button type="primary" @click="handleBack" class="back-btn">
+      <el-icon><ArrowLeft /></el-icon>
+      返回列表
+    </el-button>
+
+    <el-form :model="form" label-width="100px" v-loading="loading">
+      <el-form-item label="课程标题" required>
+        <el-input v-model="form.title" />
       </el-form-item>
-      
+
       <el-form-item label="作者" required>
-        <el-input v-model="course.author" placeholder="请输入作者姓名" />
+        <el-input v-model="form.author" />
       </el-form-item>
-      
-      <el-form-item label="封面图片">
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :show-file-list="false"
-          :on-success="handleCoverUpload"
-          :before-upload="beforeCoverUpload"
-        >
-          <img v-if="course.coverUrl" :src="course.coverUrl" class="cover-image" />
-          <el-icon v-else class="cover-uploader-icon"><Plus /></el-icon>
-        </el-upload>
-      </el-form-item>
-      
-      <el-form-item label="课程简介" required>
-        <el-input 
-          v-model="course.intro" 
-          type="textarea" 
-          :rows="4" 
-          placeholder="请输入课程简介"
-        />
-      </el-form-item>
-      
-      <el-form-item label="课程视频">
-        <el-input v-model="course.videoUrl" placeholder="请输入视频URL" />
-      </el-form-item>
-      
-      <el-form-item label="课程状态">
-        <el-select v-model="course.status" placeholder="请选择状态">
+
+      <el-form-item label="状态">
+        <el-select v-model="form.status">
           <el-option label="已发布" value="已发布" />
           <el-option label="审核中" value="审核中" />
           <el-option label="未通过" value="未通过" />
         </el-select>
       </el-form-item>
-      
+
+      <el-form-item label="课程封面">
+        <el-upload
+          action="#"
+          :auto-upload="false"
+          :on-change="handleCoverChange"
+          :show-file-list="false"
+        >
+          <el-button type="primary">选择封面</el-button>
+          <span v-if="coverPreview" class="preview-tip">已选择新封面</span>
+        </el-upload>
+        <el-image
+          v-if="form.coverUrl && !coverPreview"
+          :src="getFinalUrl(form.coverUrl)"
+          style="width: 200px; margin-top: 10px"
+          fit="cover"
+        />
+      </el-form-item>
+
+      <el-form-item label="课程视频">
+        <el-upload
+          action="#"
+          :auto-upload="false"
+          :on-change="handleVideoChange"
+          :show-file-list="false"
+        >
+          <el-button type="primary">选择视频</el-button>
+          <span v-if="videoFile" class="preview-tip">已选择新视频</span>
+        </el-upload>
+        <video
+          v-if="form.videoUrl && !videoFile"
+          controls
+          style="width: 300px; margin-top: 10px"
+          :src="getFinalUrl(form.videoUrl)"
+        />
+      </el-form-item>
+
+      <el-form-item label="课程简介">
+        <el-input v-model="form.intro" type="textarea" rows="4" />
+      </el-form-item>
+
       <el-form-item>
-        <el-button type="primary" @click="save">保存</el-button>
-        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="submitForm">保存修改</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { ArrowLeft } from '@element-plus/icons-vue'
+
+interface FormData {
+  id: number
+  title: string
+  author: string
+  status: string
+  coverUrl?: string
+  intro?: string
+  videoUrl?: string
+}
 
 const route = useRoute()
 const router = useRouter()
-const course = ref(null)
+const loading = ref(false)
+const form = ref<FormData>({
+  id: 0,
+  title: '',
+  author: '',
+  status: '已发布'
+})
+const coverFile = ref<File | null>(null)
+const videoFile = ref<File | null>(null)
+const coverPreview = ref(false)
 
-// Mock data - in a real app, this would come from an API
-const mockCourses = [
-  {
-    id: 1,
-    name: 'Web前端开发实战',
-    author: '王教授',
-    status: '已发布',
-    coverUrl: 'https://picsum.photos/200/150',
-    intro: '本课程全面讲解Web前端开发技术栈...',
-    videoUrl: 'https://example.com/course1.mp4'
+const getFinalUrl = (url?: string): string | undefined => {
+  if (!url) return undefined
+  if (url.startsWith('http') || url.startsWith('data:')) return url
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
+}
+
+const handleBack = () => {
+  router.push('/userhome/coursemanage/list')
+}
+
+const handleCoverChange = (file: File) => {
+  coverFile.value = file.raw
+  coverPreview.value = true
+}
+
+const handleVideoChange = (file: File) => {
+  videoFile.value = file.raw
+}
+
+const loadCourse = async () => {
+  try {
+    loading.value = true
+    const id = route.params.id
+    const res = await axios.get(`/api/course/${id}`)
+    
+    if (res.data.success) {
+      form.value = {
+        ...res.data.data,
+        id: Number(id)
+      }
+    }
+  } catch (error) {
+    ElMessage.error('加载课程失败')
+  } finally {
+    loading.value = false
   }
-]
+}
+
+const submitForm = async () => {
+  try {
+    loading.value = true
+    const formData = new FormData()
+    
+    // 添加基本字段
+    formData.append('title', form.value.title)
+    formData.append('author', form.value.author)
+    if (form.value.intro) formData.append('intro', form.value.intro)
+    if (form.value.status) formData.append('status', form.value.status)
+    
+    // 添加文件
+    if (coverFile.value) formData.append('cover', coverFile.value)
+    if (videoFile.value) formData.append('video', videoFile.value)
+
+    const res = await axios.post(`/api/course/edit/${form.value.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    if (res.data.success) {
+      ElMessage.success('修改成功')
+      router.push('/userhome/coursemanage/list')
+    } else {
+      throw new Error(res.data.message || '修改失败')
+    }
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '修改失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 onMounted(() => {
-  const id = parseInt(route.params.id)
-  // Find the course in mock data
-  const foundCourse = mockCourses.find(c => c.id === id)
-  if (foundCourse) {
-    course.value = { ...foundCourse }
-  } else {
-    ElMessage.error('课程不存在')
-    router.push('/course-manage/list')
-  }
+  loadCourse()
 })
-
-function save() {
-  // In a real app, this would be an API call
-  console.log('Saving course:', course.value)
-  ElMessage.success('课程保存成功')
-  router.push('/course-manage/list')
-}
-
-function cancel() {
-  router.push('/course-manage/list')
-}
-
-function handleCoverUpload(response, file) {
-  // In a real app, this would get the URL from the response
-  course.value.coverUrl = URL.createObjectURL(file.raw)
-}
-
-function beforeCoverUpload(file) {
-  const isImage = file.type.startsWith('image/')
-  const isLt2M = file.size / 1024 / 1024 < 2
-
-  if (!isImage) {
-    ElMessage.error('只能上传图片文件!')
-  }
-  if (!isLt2M) {
-    ElMessage.error('图片大小不能超过2MB!')
-  }
-
-  return isImage && isLt2M
-}
 </script>
 
 <style scoped>
-.course-edit {
-  padding: 20px;
+.edit-course-container {
   max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
 }
-
-.cover-image {
-  width: 200px;
-  height: 150px;
-  object-fit: cover;
-  display: block;
+.back-btn {
+  margin-bottom: 20px;
 }
-
-.cover-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 200px;
-  height: 150px;
-  line-height: 150px;
-  text-align: center;
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.el-form-item {
-  margin-bottom: 22px;
+.preview-tip {
+  margin-left: 10px;
+  color: #67c23a;
 }
 </style>
