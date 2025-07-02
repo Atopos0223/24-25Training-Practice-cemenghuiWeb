@@ -53,4 +53,8 @@ public class UserService {
         userMapper.updatePassword(username, newPassword);
         return true;
     }
+
+    public User getUserById(Integer id) {
+        return userMapper.getUserById(id);
+    }
 }
