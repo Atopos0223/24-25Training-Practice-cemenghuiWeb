@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -80,6 +81,18 @@ public class NewsController {
             return Result.success();
         } else {
             return Result.error(404, "更新失败，未找到该新闻");
+        }
+    }
+
+    @PostMapping("/audit")
+    public Result<?> auditNews(@RequestBody Map<String, Object> params) {
+        Integer id = (Integer) params.get("id");
+        Integer status = (Integer) params.get("status");
+        int result = newsService.auditNews(id, status);
+        if (result > 0) {
+            return Result.success();
+        } else {
+            return Result.error(500, "审核失败");
         }
     }
 } 

@@ -1,33 +1,40 @@
 <template>
-  <div class="course-list">
-    <div class="action-bar">
-      <el-input v-model="searchKey" placeholder="搜索课程" style="width: 300px" />
-      <el-button type="primary" @click="goToAdd">添加课程</el-button>
-      <el-button @click="goToAudit">审核管理</el-button>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 课程列表</h2>
+    <el-divider />
+    <div class="course-list">
+      <div class="action-bar">
+        <el-input v-model="searchKey" placeholder="搜索课程" style="width: 300px" />
+        <el-button type="primary" @click="goToAdd">添加课程</el-button>
+        <el-button @click="goToAudit">审核管理</el-button>
+      </div>
+
+      <el-table :data="filteredCourses" border>
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="课程名称" min-width="120" />
+        <el-table-column prop="author" label="作者" width="100" />
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{row}">
+            <el-tag :type="getStatusTagType(row.status)">{{ row.status }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="360">
+          <template #default="scope">
+            <div class="button-row">
+              <el-button type="primary" size="small" @click="viewCourse(scope.row)">查看</el-button>
+              <el-button type="warning" size="small" @click="editCourse(scope.row)">编辑</el-button>
+              <el-button type="danger" size="small" @click="deleteCourse(scope.row)">删除</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 详情弹窗 -->
+      <el-dialog v-model="detailVisible" title="课程详情" width="70%">
+        <CourseDetail v-if="currentCourse" :course="currentCourse" />
+      </el-dialog>
     </div>
-
-    <el-table :data="filteredCourses" border>
-      <el-table-column prop="name" label="课程名称" />
-      <el-table-column prop="author" label="作者" />
-      <el-table-column prop="status" label="状态">
-        <template #default="{row}">
-          <el-tag :type="getStatusTagType(row.status)">{{ row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="220">
-        <template #default="{row}">
-          <el-button type="primary" size="small" @click="viewDetail(row)">查看</el-button>
-          <el-button type="warning" size="small" @click="editCourse(row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="deleteCourse(row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- 详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="课程详情" width="70%">
-      <CourseDetail v-if="currentCourse" :course="currentCourse" />
-    </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -68,7 +75,7 @@ const getStatusTagType = (status: string) => {
   return map[status] || ''
 }
 
-const viewDetail = (course: any) => {
+const viewCourse = (course: any) => {
   currentCourse.value = course
   detailVisible.value = true
 }
@@ -91,6 +98,42 @@ const goToAudit = () => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .course-list {
   padding: 20px;
 }
@@ -98,5 +141,14 @@ const goToAudit = () => {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+}
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>

@@ -72,12 +72,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '创建会议' }
       },
 	  {
-        path: 'personal-center',
-        name: 'PersonalCenter',
-        component: () => import('@/views/admin/PersonalCenter.vue'),
-        meta: { title: '个人中心' }
-      },
-	  {
         path: 'manage-dynamics',
         component: () => import('@/views/admin/DynamicList.vue'),
         meta: { title: '动态列表' }
@@ -99,6 +93,21 @@ const routes: RouteRecordRaw[] = [
 	    meta: { title: '会议列表' }
 	  },
 	  {
+
+        path: 'dynamic-detail/:id',
+        name: 'AdminDynamicDetail',
+        component: () => import('@/views/user/DynamicDetail.vue'),
+        meta: { title: '动态详情' },
+        props: true
+      },
+      {
+        path: 'edit-dynamic/:id',
+        name: 'AdminEditDynamic',
+        component: () => import('@/views/user/EditDynamic.vue'),
+        meta: { title: '编辑动态' },
+        props: true
+      },
+      {
         path: '/adminhome/meetingmanage/edit',
         name: 'AdminEditMeeting',
         component: () => import('@/views/admin/EditMeeting.vue')
@@ -116,6 +125,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/CreateMeeting.vue'),
         meta: { title: '创建会议' }
       },
+
 	]
   },
   

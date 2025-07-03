@@ -1,8 +1,9 @@
 <template>
-  <div class="edit-dynamic">
-    <el-card>
-      <h2>编辑动态</h2>
-      <el-form :model="form" ref="formRef" label-width="80px">
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 编辑动态</h2>
+    <el-divider />
+    <div class="edit-dynamic">
+      <el-form :model="form" ref="formRef" label-width="120px">
         <el-form-item label="标题" prop="title" required>
           <el-input v-model="form.title" placeholder="请输入新闻标题" />
         </el-form-item>
@@ -29,8 +30,8 @@
           <el-button type="primary" @click="submitForm">保存</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
-  </div>
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -86,9 +87,36 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.edit-dynamic {
-  max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-input {
+  border-radius: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
 }
 </style> 

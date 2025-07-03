@@ -1,57 +1,60 @@
 <template>
-  <div class="meeting-list">
-    <div class="header">
-      <el-button type="primary" @click="goToCreate">创建会议</el-button>
-    </div>
-    
-    <div class="filter-container">
-      <el-input 
-        v-model="searchParams.name" 
-        placeholder="会议名称" 
-        style="width: 200px"
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Calendar /></el-icon> 会议列表</h2>
+    <el-divider />
+    <div class="meeting-list">
+      <div class="header">
+        <el-button type="primary" @click="goToCreate">创建会议</el-button>
+      </div>
+      
+      <div class="filter-container">
+        <el-input 
+          v-model="searchParams.name" 
+          placeholder="会议名称" 
+          style="width: 200px"
+        />
+        <el-date-picker
+          v-model="searchParams.dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="YYYY-MM-DD"
+        />
+        <el-button type="primary" @click="filterMeetings">搜索</el-button>
+      </div>
+      
+      <el-table :data="allMeetings" border style="width: 100%">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="name" label="会议名称" min-width="120" />
+        <el-table-column prop="creator_name" label="创建人" width="100" />
+        <el-table-column prop="startTime" label="开始时间" width="160" />
+        <el-table-column prop="location" label="会议地点"/>
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{row}">
+            <el-tag>{{ statusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="360">
+          <template #default="{row}">
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(row.id)">查看</el-button>
+              <el-button size="small" type="warning" @click="editMeeting(row)">编辑</el-button>
+              <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)">删除</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <el-pagination
+        v-model:current-page="pagination.current"
+        v-model:page-size="pagination.size"
+        :total="pagination.total"
+        @current-change="filterMeetings"
+        layout="total, prev, pager, next"
       />
-      <el-date-picker
-        v-model="searchParams.dateRange"
-        type="daterange"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        value-format="YYYY-MM-DD"
-      />
-      <el-button type="primary" @click="filterMeetings">搜索</el-button>
     </div>
-    
-    <el-table :data="allMeetings" border style="width: 100%">
-      <el-table-column type="index" label="序号" width="60" />
-      <el-table-column prop="name" label="会议名称" width="180"/>
-      <el-table-column prop="startTime" label="开始时间" width="180">
-        <template #default="{row}">
-          {{ formatDateTime(row.startTime) }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="location" label="会议地点"/>
-      <el-table-column prop="status" label="状态">
-        <template #default="{row}">
-          <el-tag>{{ statusText(row.status) }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="220">
-        <template #default="{row}">
-          <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
-          <el-button size="small" type="warning" @click="editMeeting(row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <el-pagination
-      v-model:current-page="pagination.current"
-      v-model:page-size="pagination.size"
-      :total="pagination.total"
-      @current-change="filterMeetings"
-      layout="total, prev, pager, next"
-    />
-  </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -147,7 +150,7 @@ const confirmDeleteMeeting = (id: number) => {
 }
 
 const goToCreate = () => {
-  router.push('/meeting-manage/create')
+  router.push('/adminhome/create-meeting')
 }
 
 const fetchMeetings = async () => {
@@ -167,6 +170,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -183,5 +222,15 @@ onMounted(() => {
 .el-pagination {
   margin-top: 20px;
   justify-content: flex-end;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>
