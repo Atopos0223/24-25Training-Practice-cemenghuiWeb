@@ -5,9 +5,10 @@
       <div class="filter-section">
         <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
           <el-option label="全部" value="" />
-          <el-option label="待审核" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="已拒绝" value="rejected" />
+          <el-option label="未审核" value="1" />
+          <el-option label="已通过" value="2" />
+          <el-option label="被驳回" value="3" />
+          <el-option label="草稿" value="0" />
         </el-select>
         <el-input
           v-model="searchKeyword"
@@ -23,18 +24,21 @@
     </div>
 
     <el-card>
-      <el-table :data="meetingList" style="width: 100%" v-loading="loading">
+      <el-table :data="pagedMeetings" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="会议名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="organizer" label="组织者" width="120" />
-        <el-table-column prop="meetingTime" label="会议时间" width="180" />
+        <el-table-column prop="creator_name" label="组织者" width="120" />
+        <el-table-column label="会议时间" width="180">
+          <template #default="{row}">
+            {{ row.startTime || row.start_time }}
+          </template>
+        </el-table-column>
         <el-table-column prop="location" label="地点" width="150" />
         <el-table-column prop="status" label="状态">
           <template #default="{ row }">
             <el-tag>{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="submitTime" label="提交时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
@@ -111,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
@@ -120,7 +124,7 @@ import { useRouter } from 'vue-router'
 // 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
-const statusFilter = ref('1')
+const statusFilter = ref("")
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -148,11 +152,18 @@ const filteredMeetings = computed(() => {
   if (searchKeyword.value) {
     filtered = filtered.filter(meeting => 
       meeting.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-      meeting.organizer.toLowerCase().includes(searchKeyword.value.toLowerCase())
+      meeting.creator_name.toLowerCase().includes(searchKeyword.value.toLowerCase())
     )
   }
 
   return filtered
+})
+
+const pagedMeetings = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  total.value = filteredMeetings.value.length
+  return filteredMeetings.value.slice(start, end)
 })
 
 // 方法
@@ -225,7 +236,9 @@ const fetchMeetings = async () => {
   if (res.data && res.data.code === 200) {
     meetingList.value = res.data.data.map(item => ({
       ...item,
-      name: item.title
+      name: item.title,
+      creator_name: item.creator_name,
+      startTime: item.startTime || item.start_time
     }))
   }
 }
@@ -239,6 +252,11 @@ const auditMeeting = async (id, status) => {
     ElMessage.error(res.data?.message || '操作失败')
   }
 }
+
+// 监听筛选和搜索变化时重置页码
+watch([statusFilter, searchKeyword], () => {
+  currentPage.value = 1
+})
 
 // 生命周期
 onMounted(() => {
