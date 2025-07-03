@@ -91,7 +91,7 @@ const submitForm = async () => {
     })
     if (res.data && res.data.code === 200) {
       ElMessage.success('会议创建成功')
-      router.push('/manage-meetings')
+      router.push('/adminhome/manage-meetings')
     } else {
       ElMessage.error(res.data?.message || '创建失败')
     }
