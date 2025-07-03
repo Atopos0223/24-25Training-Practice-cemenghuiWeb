@@ -28,4 +28,10 @@ public interface CourseMapper {
 
     @Delete("DELETE FROM \"course\" WHERE \"id\"=#{id}")
     int deleteById(Long id);
+
+    @Select("SELECT * FROM course WHERE status = #{status}")
+    List<Course> selectByStatus(@Param("status") String status);
+
+    @Select("SELECT * FROM course WHERE status != #{status}")
+    List<Course> selectByStatusNot(@Param("status") String status);
 }

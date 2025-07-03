@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper
 public interface MeetingMapper {
-    @Insert("INSERT INTO meeting (title, content, start_time, end_time, location, cover, creator_id, create_time, status) VALUES (#{title}, #{content}, #{startTime}, #{endTime}, #{location}, #{cover}, #{creatorId}, #{createTime}, #{status})")
+    @Insert("INSERT INTO meeting (title, content, start_time, end_time, location, cover, creator_id, create_time, status,creator_name) VALUES (#{title}, #{content}, #{start_time}, #{end_time}, #{location}, #{cover}, #{creator_id}, #{create_time}, #{status},#{creator_name})")
     void insertMeeting(Meeting meeting);
 
     @Select("SELECT * FROM meeting")
@@ -27,8 +27,10 @@ public interface MeetingMapper {
     @Select("SELECT * FROM meeting WHERE id = #{id}")
     Meeting selectMeetingWithCreatorNameById(Long id);
 
-    @Update("UPDATE meeting SET title=#{title}, content=#{content}, start_time=#{startTime}, end_time=#{endTime}, location=#{location}, cover=#{cover} WHERE id=#{id}")
+    @Update("UPDATE meeting SET title=#{title}, content=#{content}, start_time=#{start_time}, end_time=#{end_time}, location=#{location}, cover=#{cover}, status=#{status} WHERE id=#{id}")
     void updateMeeting(Meeting meeting);
 
+    @Update("UPDATE meeting SET status = #{status} WHERE id = #{id}")
+    void updateMeetingStatus(Long id, Integer status);
 
 } 

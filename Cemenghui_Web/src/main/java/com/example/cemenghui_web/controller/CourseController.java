@@ -2,8 +2,10 @@ package com.example.cemenghui_web.controller;
 
 import com.example.cemenghui_web.entity.Course;
 import com.example.cemenghui_web.mapper.CourseMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/course")
 public class CourseController {
@@ -54,7 +57,7 @@ public class CourseController {
             course.setCoverUrl("/uploads/" + coverName);
             course.setIntro(intro);
             course.setVideoUrl(videoName != null ? "/uploads/" + videoName : null);
-            course.setStatus(status);
+            course.setStatus("审核中");
             course.setCreateTime(new Date());
 
             // 5. 写入数据库
@@ -102,31 +105,71 @@ public class CourseController {
         // 实现失败时清理已上传文件的逻辑
     }
 
+    // 获取待审核课程
+    @GetMapping("/list/auditing")
+    public Map<String, Object> getAuditingCourses() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Course> courses = courseMapper.selectByStatus("审核中");
+            courses.forEach(c -> System.out.println("封面路径: " + c.getCoverUrl()));
+            result.put("success", true);
+            result.put("data", courses);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "查询失败: " + e.getMessage());
+        }
+        return result;
+    }
+
+    // 获取已审核课程（管理用）
+    @GetMapping("/list/managed")
+    public Map<String, Object> getManagedCourses() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Course> courses = courseMapper.selectByStatusNot("审核中");
+            courses.forEach(c -> System.out.println("封面路径: " + c.getCoverUrl()));
+            result.put("success", true);
+            result.put("data", courses);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "查询失败: " + e.getMessage());
+        }
+        return result;
+    }
+
     @GetMapping("/{id}")
     public Map<String, Object> getCourseDetail(@PathVariable Long id) {
         System.out.println("请求的课程ID: " + id);
 
-        Course course = courseMapper.selectById(id);
-        System.out.println("数据库查询结果: " + course); // 现在会打印详细字段
+        try {
+            Course course = courseMapper.selectById(id);
+            if (course == null) {
+                System.out.println("课程不存在: " + id);
+                return Map.of("success", false, "message", "课程不存在");
+            }
 
-        if (course == null) {
-            System.out.println("课程不存在: " + id);
-            return Map.of("success", false, "message", "课程不存在");
-        }
+            // 修正URL处理逻辑
+            course.setCoverUrl(fixUrl(course.getCoverUrl()));
+            course.setVideoUrl(fixUrl(course.getVideoUrl()));
 
-        // 确保封面URL格式正确
-        if (course.getCoverUrl() != null && !course.getCoverUrl().startsWith("http")) {
-            course.setCoverUrl("/uploads/" + course.getCoverUrl().replaceFirst("^/uploads/", ""));
+            System.out.println("返回的课程数据: " + course);
+            return Map.of("success", true, "data", course);
+        } catch (Exception e) {
+            System.out.println("查询异常: " + e.getMessage());
+            return Map.of("success", false, "message", "服务器错误");
         }
-        // 确保视频URL格式正确
-        if (course.getVideoUrl() != null && !course.getVideoUrl().startsWith("http")) {
-            course.setVideoUrl("/uploads/" + course.getVideoUrl().replaceFirst("^/uploads/", ""));
-        }
-
-        return Map.of("success", true, "data", course);
     }
 
-    @PostMapping("/edit/{id}")
+    // 独立的URL处理方法
+    private String fixUrl(String url) {
+        if (url == null || url.startsWith("http")) {
+            return url;
+        }
+        // 统一处理为以/uploads/开头且不重复
+        return "/uploads/" + url.replaceFirst("^/uploads/", "").replaceFirst("^uploads/", "");
+    }
+
+    @PutMapping("/{id}")
     public Map<String, Object> editCourse(
             @PathVariable Long id,
             @RequestParam(value = "title", required = false) String title,
@@ -189,6 +232,52 @@ public class CourseController {
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "删除失败: " + e.getMessage());
+        }
+        return result;
+    }
+
+
+
+    @PostMapping("/audit")
+    @Transactional
+    public Map<String, Object> auditCourse(
+            @RequestParam("id") Long id,
+            @RequestParam("action") String action,
+            @RequestParam(value = "comment", required = false) String comment) {
+
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // 1. 校验参数
+            if (!"pass".equals(action) && !"reject".equals(action)) {
+                throw new IllegalArgumentException("无效操作类型");
+            }
+            if ("reject".equals(action) && (comment == null || comment.trim().isEmpty())) {
+                throw new IllegalArgumentException("拒绝原因不能为空");
+            }
+
+            // 2. 查询课程
+            Course course = courseMapper.selectById(id);
+            if (course == null) {
+                throw new IllegalArgumentException("课程不存在");
+            }
+
+            // 3. 更新状态
+            String newStatus = "pass".equals(action) ? "已发布" : "未通过";
+            course.setStatus(newStatus);
+            course.setAuditComment(comment);
+
+            // 4. 保存到数据库
+            int affectedRows = courseMapper.updateCourse(course);
+            if (affectedRows <= 0) {
+                throw new RuntimeException("更新失败");
+            }
+
+            result.put("success", true);
+            result.put("message", "操作成功");
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            log.error("审核失败: id={}, action={}", id, action, e);
         }
         return result;
     }

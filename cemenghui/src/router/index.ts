@@ -34,6 +34,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/AuditNews.vue'),
         meta: { title: '审核资讯' }
       },
+	  
 	  {
         path: 'audit-courses',
         name: 'AuditCourses',
@@ -41,7 +42,25 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '审核课程' }
       },
 	  {
+
+	  path: '/courses-management',
+	    name: 'CoursesManagement',
+	    component: () => import('@/views/admin/CoursesManagement.vue'),
+	    meta: { title: '管理课程' }
+	  },
+	{
+	path: 'courses-management/edit/:id',
+	  name: 'EditCourse',
+	  component: () => import('@/views/admin/EditCourse.vue'),
+	  meta: { title: '编辑课程' },
+	  props: true  // 允许将路由参数传递给组件
+	},
+	
+	
+	  {
+    
         path: 'audit-meetings',
+
         name: 'AuditMeetings',
         component: () => import('@/views/admin/AuditMeetings.vue'),
         meta: { title: '审核会议' }
@@ -80,6 +99,7 @@ const routes: RouteRecordRaw[] = [
 	    meta: { title: '会议列表' }
 	  },
 	  {
+
         path: 'dynamic-detail/:id',
         name: 'AdminDynamicDetail',
         component: () => import('@/views/user/DynamicDetail.vue'),
@@ -93,6 +113,25 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '编辑动态' },
         props: true
       },
+
+        path: '/adminhome/meetingmanage/edit',
+        name: 'AdminEditMeeting',
+        component: () => import('@/views/admin/EditMeeting.vue')
+      },
+	  {
+        path: '/adminhome/meetingmanage/detail/:id',
+        name: 'AdminMeetingDetail',
+        component: () => import('@/views/admin/MeetingDetail.vue'),
+        meta: { title: '会议详情' },
+        props: true
+      },
+	  {
+        path: '/adminhome/meetingmanage/create',
+        name: 'AdminCreateMeeting',
+        component: () => import('@/views/admin/CreateMeeting.vue'),
+        meta: { title: '创建会议' }
+      },
+
 	]
   },
   
