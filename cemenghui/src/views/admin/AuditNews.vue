@@ -1,32 +1,34 @@
 <template>
-  <div class="audit-news">
-    <div class="page-header">
-      <h2>审核资讯</h2>
-      <div class="filter-section">
-        <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
-          <el-option label="全部" value="" />
-          <el-option label="待审核" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="已拒绝" value="rejected" />
-        </el-select>
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索标题或作者"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 审核资讯</h2>
+    <el-divider />
+    <div class="audit-news">
+      <div class="page-header">
+        <h2>审核资讯</h2>
+        <div class="filter-section">
+          <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
+            <el-option label="全部" value="" />
+            <el-option label="待审核" value="pending" />
+            <el-option label="已通过" value="approved" />
+            <el-option label="已拒绝" value="rejected" />
+          </el-select>
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索标题或作者"
+            style="width: 250px"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
       </div>
-    </div>
 
-    <el-card>
       <el-table :data="filteredNews" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="author" label="作者" width="120" />
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="标题" min-width="120" />
+        <el-table-column prop="author" label="作者" width="100" />
         <el-table-column prop="category" label="分类" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
@@ -35,26 +37,20 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="发布时间" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+
+        <el-table-column prop="createTime" label="发布时间" width="160">
           <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="success" 
-              @click="approveNews(scope.row)"
-            >
-              通过
-            </el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="danger" 
-              @click="rejectNews(scope.row)"
-            >
-              拒绝
-            </el-button>
+            {{ formatDateTime(scope.row.createTime) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" width="360" fixed="right">
+          <template #default="scope">
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(scope.row)">查看</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="success" @click="approveNews(scope.row)">通过</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="danger" @click="rejectNews(scope.row)">拒绝</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -70,20 +66,27 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 详情对话框 -->
     <el-dialog v-model="showDetailDialog" title="资讯详情" width="800px">
       <div v-if="selectedNews" class="news-detail">
-        <div class="detail-header">
-          <h3>{{ selectedNews.title }}</h3>
-          <div class="meta-info">
-            <span>作者：{{ selectedNews.author }}</span>
-            <span>分类：{{ selectedNews.category }}</span>
-            <span>发布时间：{{ selectedNews.createTime }}</span>
-          </div>
+        <h2>{{ selectedNews.title }}</h2>
+        <div style="margin-bottom: 16px;">
+          <span>
+            <el-icon><User /></el-icon>
+            作者ID：{{ selectedNews.id }}
+          </span>
+          <span style="margin-left: 24px;">
+            <el-icon><Clock /></el-icon>
+            发布时间：{{ formatDateTime(selectedNews.createTime) }}
+          </span>
         </div>
-        <div class="detail-content" v-html="selectedNews.content"></div>
+        <div v-if="selectedNews.image" style="margin-bottom: 16px;">
+          <img :src="selectedNews.image.startsWith('http') ? selectedNews.image : 'http://localhost:8080' + selectedNews.image" alt="新闻图片" style="max-width: 300px;" />
+        </div>
+        <el-divider />
+        <div class="content" v-html="selectedNews.content"></div>
         <div v-if="selectedNews.auditComment" class="audit-comment">
           <h4>审核意见：</h4>
           <p>{{ selectedNews.auditComment }}</p>
@@ -110,15 +113,15 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
+import { Search, User, Clock } from '@element-plus/icons-vue'
 
-// 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
 const statusFilter = ref('')
@@ -130,68 +133,44 @@ const showAuditDialog = ref(false)
 const selectedNews = ref(null)
 const auditAction = ref('')
 const auditFormRef = ref()
+const newsList = ref([])
 
-// 资讯数据
-const newsList = ref([
-  {
-    id: 1,
-    title: '人工智能在测试行业的应用前景',
-    author: '张三',
-    category: '技术动态',
-    status: 'pending',
-    createTime: '2025-01-15 10:30:00',
-    auditTime: '',
-    content: '随着人工智能技术的快速发展，AI在软件测试领域的应用越来越广泛...',
-    auditComment: ''
-  },
-  {
-    id: 2,
-    title: '自动化测试工具对比分析',
-    author: '李四',
-    category: '工具评测',
-    status: 'approved',
-    createTime: '2025-01-14 15:20:00',
-    auditTime: '2025-01-15 09:00:00',
-    content: '本文对比了市面上主流的自动化测试工具，包括Selenium、Appium等...',
-    auditComment: '内容详实，分析到位'
-  },
-  {
-    id: 3,
-    title: '测试团队管理最佳实践',
-    author: '王五',
-    category: '管理经验',
-    status: 'rejected',
-    createTime: '2025-01-13 14:10:00',
-    auditTime: '2025-01-14 16:30:00',
-    content: '分享测试团队管理的经验和教训...',
-    auditComment: '内容过于简单，缺乏深度'
+const fetchNewsList = async () => {
+  loading.value = true
+  try {
+    const res = await axios.get('http://localhost:8080/news/all')
+    const list = Array.isArray(res.data.data) ? res.data.data : []
+    newsList.value = list.map(item => ({
+      ...item,
+      createTime: item.createTime || item.create_time || item.publishTime || item.time || '',
+      status: item.status === 0 ? 'pending' : item.status === 1 ? 'approved' : 'rejected'
+    }))
+    total.value = newsList.value.length
+  } catch (e) {
+    ElMessage.error('获取资讯失败')
+  } finally {
+    loading.value = false
   }
-])
+}
 
-// 审核表单
 const auditForm = reactive({
   comment: ''
 })
 
-// 计算属性
 const filteredNews = computed(() => {
   let filtered = newsList.value
-
   if (statusFilter.value) {
     filtered = filtered.filter(news => news.status === statusFilter.value)
   }
-
   if (searchKeyword.value) {
-    filtered = filtered.filter(news => 
+    filtered = filtered.filter(news =>
       news.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
       news.author.toLowerCase().includes(searchKeyword.value.toLowerCase())
     )
   }
-
   return filtered
 })
 
-// 方法
 const getStatusType = (status) => {
   const statusTypes = {
     'pending': 'warning',
@@ -243,14 +222,17 @@ const submitAudit = async () => {
     ElMessage.warning('拒绝审核时必须填写拒绝原因')
     return
   }
-
   try {
-    // 更新资讯状态
     const news = selectedNews.value
-    news.status = auditAction.value === 'approve' ? 'approved' : 'rejected'
+    const newStatus = auditAction.value === 'approve' ? 1 : 2
+    await axios.post('http://localhost:8080/news/audit', {
+      id: Number(news.id),
+      status: Number(newStatus),
+      auditComment: auditForm.comment
+    })
+    news.status = newStatus === 1 ? 'approved' : 'rejected'
     news.auditTime = new Date().toLocaleString()
     news.auditComment = auditForm.comment
-
     ElMessage.success(`审核${auditAction.value === 'approve' ? '通过' : '拒绝'}成功`)
     showAuditDialog.value = false
   } catch (error) {
@@ -258,13 +240,56 @@ const submitAudit = async () => {
   }
 }
 
-// 生命周期
+function formatDateTime(val) {
+  if (!val) return ''
+  // 只保留到秒，去掉毫秒和多余部分
+  // 支持 '2025-07-03 07:46:26.000' 或 '2025-07-03T07:46:26.000Z' 等格式
+  const match = val.match(/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/)
+  return match ? match[0].replace('T', ' ') : val
+}
+
 onMounted(() => {
-  total.value = newsList.value.length
+  fetchNewsList()
 })
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .audit-news {
   padding: 20px;
 }
@@ -297,22 +322,14 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-.detail-header h3 {
-  margin: 0 0 10px 0;
-  color: #303133;
+.news-detail h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.meta-info {
-  display: flex;
-  gap: 20px;
-  color: #909399;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.detail-content {
-  line-height: 1.6;
-  color: #606266;
+.content {
+  line-height: 1.8;
 }
 
 .audit-comment {
@@ -331,5 +348,16 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style> 

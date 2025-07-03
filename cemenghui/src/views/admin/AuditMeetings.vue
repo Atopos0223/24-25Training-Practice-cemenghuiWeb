@@ -1,49 +1,45 @@
 <template>
-  <div class="audit-meetings">
-    <div class="page-header">
-      <h2>审核会议</h2>
-      <div class="filter-section">
-        <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
-          <el-option label="全部" value="" />
-          <el-option label="未审核" value="1" />
-          <el-option label="已通过" value="2" />
-          <el-option label="被驳回" value="3" />
-          <el-option label="草稿" value="0" />
-        </el-select>
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索会议名称或组织者"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Calendar /></el-icon> 审核会议</h2>
+    <el-divider />
+    <div class="audit-meetings">
+      <div class="page-header">
+        <h2>审核会议</h2>
+        <div class="filter-section">
+          <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
+            <el-option label="全部" value="" />
+            <el-option label="未审核" value="1" />
+            <el-option label="已通过" value="2" />
+            <el-option label="被驳回" value="3" />
+            <el-option label="草稿" value="0" />
+          </el-select>
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索会议名称或组织者"
+            style="width: 250px"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
       </div>
-    </div>
 
-    <el-card>
       <el-table :data="pagedMeetings" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="会议名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="creator_name" label="组织者" width="120" />
-        <el-table-column label="会议时间" width="180">
-          <template #default="{row}">
-            {{ row.startTime || row.start_time }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="location" label="地点" width="150" />
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="name" label="会议名称" min-width="120" />
+        <el-table-column prop="creator_name" label="组织者" width="100" />
+        <el-table-column prop="startTime" label="会议时间" width="160" />
+        <el-table-column prop="location" label="地点" width="120" />
+        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
-            <el-tag>{{ statusText(row.status) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
-            <el-button size="small" type="success" @click="auditMeeting(row.id, 2)" v-if="row.status == 1">通过</el-button>
-            <el-button size="small" type="danger" @click="auditMeeting(row.id, 3)" v-if="row.status == 1">驳回</el-button>
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(row.id)">查看</el-button>
+              <el-button size="small" type="success" @click="auditMeeting(row.id, 2)" v-if="row.status == 1">通过</el-button>
+              <el-button size="small" type="danger" @click="auditMeeting(row.id, 3)" v-if="row.status == 1">驳回</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -59,7 +55,7 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 详情对话框 -->
     <el-dialog v-model="showDetailDialog" title="会议详情" width="800px">
@@ -111,13 +107,13 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Calendar } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 import { useRouter } from 'vue-router'
 
@@ -266,6 +262,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .audit-meetings {
   padding: 20px;
 }
@@ -369,5 +401,16 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style> 

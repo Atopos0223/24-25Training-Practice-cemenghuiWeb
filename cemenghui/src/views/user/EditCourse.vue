@@ -110,12 +110,12 @@ const handleBack = () => {
   router.push('/userhome/coursemanage/list')
 }
 
-const handleCoverChange = (file: File) => {
-  coverFile.value = file.raw
+const handleCoverChange = (file: any) => {
+  coverFile.value = (file as any).raw
   coverPreview.value = true
 }
 
-const handleVideoChange = (file: File) => {
+const handleVideoChange = (file: any) => {
   videoFile.value = file.raw
 }
 
@@ -146,14 +146,26 @@ const submitForm = async () => {
     // 添加基本字段
     formData.append('title', form.value.title)
     formData.append('author', form.value.author)
-    if (form.value.intro) formData.append('intro', form.value.intro)
-    if (form.value.status) formData.append('status', form.value.status)
+    formData.append('status', form.value.status)
     
-    // 添加文件
+    // 可选字段
+    if (form.value.intro) formData.append('intro', form.value.intro)
+    
+    // 文件处理 - 使用后端期望的参数名
     if (coverFile.value) formData.append('cover', coverFile.value)
     if (videoFile.value) formData.append('video', videoFile.value)
 
-    const res = await axios.post(`/api/course/edit/${form.value.id}`, formData, {
+    console.log('FormData内容:', {
+      title: form.value.title,
+      author: form.value.author,
+      status: form.value.status,
+      intro: form.value.intro,
+      hasCover: !!coverFile.value,
+      hasVideo: !!videoFile.value
+    })
+
+    // 修改API端点以匹配后端
+    const res = await axios.put(`/api/course/${form.value.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -161,20 +173,26 @@ const submitForm = async () => {
 
     if (res.data.success) {
       ElMessage.success('修改成功')
+      coverFile.value = null
+      videoFile.value = null
+      coverPreview.value = false
       router.push('/userhome/coursemanage/list')
     } else {
       throw new Error(res.data.message || '修改失败')
     }
   } catch (error) {
+    console.error('提交错误详情:', error)
     ElMessage.error(error instanceof Error ? error.message : '修改失败')
   } finally {
     loading.value = false
   }
 }
 
+// 确保onMounted调用loadCourse
 onMounted(() => {
-  loadCourse()
-})
+  console.log('当前课程ID:', route.params.id);
+  loadCourse().catch(e => console.error('加载失败:', e));
+});
 </script>
 
 <style scoped>

@@ -1,74 +1,85 @@
 <template>
-  <div class="audit-courses">
-    <div class="page-header">
-      <h2>审核课程</h2>
-      <div class="filter-section">
-        <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
-          <el-option label="全部" value="" />
-          <el-option label="待审核" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="已拒绝" value="rejected" />
-        </el-select>
-        <el-select v-model="categoryFilter" placeholder="分类筛选" style="width: 120px; margin-right: 10px">
-          <el-option label="全部" value="" />
-          <el-option label="功能测试" value="功能测试" />
-          <el-option label="性能测试" value="性能测试" />
-          <el-option label="自动化测试" value="自动化测试" />
-          <el-option label="安全测试" value="安全测试" />
-        </el-select>
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索课程名称或讲师"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 审核课程</h2>
+    <el-divider />
+    <div class="audit-courses">
+      <div class="page-header">
+        <h2>审核课程</h2>
+        <div class="filter-section">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索课程名称或作者"
+            style="width: 250px"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
       </div>
-    </div>
 
-    <el-card>
       <el-table :data="filteredCourses" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="课程名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="instructor" label="讲师" width="120" />
-        <el-table-column prop="category" label="分类" width="120" />
-        <el-table-column prop="duration" label="时长" width="100" />
-        <el-table-column prop="price" label="价格" width="100">
-          <template #default="scope">
-            <span v-if="scope.row.price > 0">¥{{ scope.row.price }}</span>
-            <span v-else class="free-tag">免费</span>
-          </template>
-        </el-table-column>
+        <el-table-column 
+          type="index"
+          label="序号"
+          width="80"
+          :index="(index) => index + 1"
+        />
+        <el-table-column prop="title" label="课程名称" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="author" label="作者" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </el-tag>
+            <el-tag type="warning">审核中</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="submitTime" label="提交时间" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column prop="createTime" label="提交时间" width="180">
           <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="success" 
-              @click="approveCourse(scope.row)"
+            {{ formatDate(scope.row.createTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="封面" width="120">
+          <template #default="scope">
+            <el-image 
+              :src="getFinalCoverUrl(scope.row.coverUrl)"
+              :preview-src-list="[getFinalCoverUrl(scope.row.coverUrl)]"
+              style="width: 80px; height: 45px"
+              fit="cover"
+              @error="handleImageError(scope.row.id, scope.row.coverUrl)"
             >
-              通过
-            </el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="danger" 
-              @click="rejectCourse(scope.row)"
-            >
-              拒绝
-            </el-button>
+              <template #error>
+                <div class="image-slot">
+                  <el-icon><Picture /></el-icon>
+                  <span>封面加载失败</span>
+                </div>
+              </template>
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column label="视频" width="120">
+          <template #default="scope">
+            <div class="video-container">
+              <el-button 
+                type="primary" 
+                size="small" 
+                @click="previewVideo(scope.row)"
+                :disabled="!scope.row.videoUrl"
+              >
+                {{ scope.row.videoUrl ? '预览视频' : '无视频' }}
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="submitTime" label="提交时间" width="160" />
+
+        <el-table-column label="操作" width="360">
+          <template #default="scope">
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(scope.row)">查看</el-button>
+              <el-button size="small" type="success" @click="approveCourse(scope.row)">通过</el-button>
+              <el-button size="small" type="danger" @click="rejectCourse(scope.row)">拒绝</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -84,7 +95,24 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
+
+    <!-- 视频预览对话框 -->
+    <el-dialog v-model="videoDialogVisible" title="视频预览" width="70%">
+      <video 
+        v-if="currentVideoUrl"
+        controls
+        style="width: 100%"
+        :src="currentVideoUrl"
+        @error="handleVideoError"
+      >
+        您的浏览器不支持视频播放
+      </video>
+      <div v-else class="video-error">
+        <el-icon><VideoCameraFilled /></el-icon>
+        <span>视频加载失败或不存在</span>
+      </div>
+    </el-dialog>
 
     <!-- 详情对话框 -->
     <el-dialog v-model="showDetailDialog" title="课程详情" width="800px">
@@ -92,42 +120,48 @@
         <div class="detail-header">
           <h3>{{ selectedCourse.title }}</h3>
           <div class="meta-info">
-            <span>讲师：{{ selectedCourse.instructor }}</span>
-            <span>分类：{{ selectedCourse.category }}</span>
-            <span>时长：{{ selectedCourse.duration }}</span>
-            <span>价格：{{ selectedCourse.price > 0 ? `¥${selectedCourse.price}` : '免费' }}</span>
+            <span>作者：{{ selectedCourse.author }}</span>
+            <span>状态：审核中</span>
+            <span>提交时间：{{ formatDate(selectedCourse.createTime) }}</span>
+          </div>
+          <div v-if="selectedCourse.coverUrl" class="cover-preview">
+            <el-image 
+              :src="getFinalCoverUrl(selectedCourse.coverUrl)"
+              :preview-src-list="[getFinalCoverUrl(selectedCourse.coverUrl)]"
+              style="width: 200px; height: 120px"
+              fit="cover"
+            />
           </div>
         </div>
-        <div class="detail-section">
+        <div v-if="selectedCourse.intro" class="detail-section">
           <h4>课程简介</h4>
-          <p>{{ selectedCourse.description }}</p>
+          <p>{{ selectedCourse.intro }}</p>
         </div>
-        <div class="detail-section">
-          <h4>课程大纲</h4>
-          <div class="outline-list">
-            <div v-for="(item, index) in selectedCourse.outline" :key="index" class="outline-item">
-              <span class="outline-number">{{ index + 1 }}</span>
-              <span class="outline-title">{{ item.title }}</span>
-              <span class="outline-duration">{{ item.duration }}</span>
-            </div>
-          </div>
-        </div>
-        <div v-if="selectedCourse.auditComment" class="audit-comment">
-          <h4>审核意见：</h4>
-          <p>{{ selectedCourse.auditComment }}</p>
+        <div v-if="selectedCourse.videoUrl" class="detail-section">
+          <h4>课程视频</h4>
+          <el-button 
+            type="primary" 
+            @click="previewVideo(selectedCourse)"
+          >
+            预览视频
+          </el-button>
         </div>
       </div>
     </el-dialog>
 
     <!-- 审核对话框 -->
-    <el-dialog v-model="showAuditDialog" :title="auditAction === 'approve' ? '通过审核' : '拒绝审核'" width="500px">
+    <el-dialog v-model="showAuditDialog" :title="isApprove ? '通过审核' : '拒绝审核'" width="500px">
       <el-form :model="auditForm" ref="auditFormRef" label-width="100px">
-        <el-form-item label="审核意见" prop="comment">
+        <el-form-item 
+          label="审核意见" 
+          prop="comment"
+          :rules="!isApprove ? [{ required: true, message: '拒绝原因不能为空', trigger: 'blur' }] : []"
+        >
           <el-input
             v-model="auditForm.comment"
             type="textarea"
             :rows="4"
-            :placeholder="auditAction === 'approve' ? '请输入通过意见（可选）' : '请输入拒绝原因'"
+            :placeholder="isApprove ? '请输入通过意见（可选）' : '请输入拒绝原因'"
           />
         </el-form-item>
       </el-form>
@@ -138,89 +172,31 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Picture, VideoCameraFilled, Notebook } from '@element-plus/icons-vue'
+import axios from 'axios'
 
 // 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
-const statusFilter = ref('')
-const categoryFilter = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const showDetailDialog = ref(false)
 const showAuditDialog = ref(false)
 const selectedCourse = ref(null)
-const auditAction = ref('')
+const isApprove = ref(true)
 const auditFormRef = ref()
+const videoDialogVisible = ref(false)
+const currentVideoUrl = ref('')
 
 // 课程数据
-const courseList = ref([
-  {
-    id: 1,
-    title: 'Selenium自动化测试实战',
-    instructor: '张老师',
-    category: '自动化测试',
-    duration: '20小时',
-    price: 299,
-    status: 'pending',
-    submitTime: '2025-01-15 10:30:00',
-    auditTime: '',
-    description: '本课程将带你深入学习Selenium自动化测试框架，从基础概念到实战项目，全面掌握Web自动化测试技能。',
-    outline: [
-      { title: 'Selenium基础介绍', duration: '2小时' },
-      { title: '元素定位方法', duration: '3小时' },
-      { title: '等待机制', duration: '2小时' },
-      { title: '测试框架搭建', duration: '4小时' },
-      { title: '实战项目', duration: '9小时' }
-    ],
-    auditComment: ''
-  },
-  {
-    id: 2,
-    title: '性能测试入门指南',
-    instructor: '李老师',
-    category: '性能测试',
-    duration: '15小时',
-    price: 0,
-    status: 'approved',
-    submitTime: '2025-01-14 15:20:00',
-    auditTime: '2025-01-15 09:00:00',
-    description: '从零开始学习性能测试，掌握JMeter等工具的使用，了解性能测试的核心概念和方法。',
-    outline: [
-      { title: '性能测试基础', duration: '3小时' },
-      { title: 'JMeter工具使用', duration: '6小时' },
-      { title: '性能分析', duration: '4小时' },
-      { title: '实战案例', duration: '2小时' }
-    ],
-    auditComment: '课程内容完整，适合初学者'
-  },
-  {
-    id: 3,
-    title: '移动端测试实践',
-    instructor: '王老师',
-    category: '功能测试',
-    duration: '18小时',
-    price: 199,
-    status: 'rejected',
-    submitTime: '2025-01-13 14:10:00',
-    auditTime: '2025-01-14 16:30:00',
-    description: '移动端测试的完整流程和方法...',
-    outline: [
-      { title: '移动端测试概述', duration: '2小时' },
-      { title: '测试工具使用', duration: '8小时' },
-      { title: '测试用例设计', duration: '6小时' },
-      { title: '实战演练', duration: '2小时' }
-    ],
-    auditComment: '课程内容需要补充更多实际案例'
-  }
-])
+const courseList = ref([])
 
 // 审核表单
 const auditForm = reactive({
@@ -229,43 +205,70 @@ const auditForm = reactive({
 
 // 计算属性
 const filteredCourses = computed(() => {
-  let filtered = courseList.value
-
-  if (statusFilter.value) {
-    filtered = filtered.filter(course => course.status === statusFilter.value)
+  if (!searchKeyword.value) {
+    return courseList.value
   }
 
-  if (categoryFilter.value) {
-    filtered = filtered.filter(course => course.category === categoryFilter.value)
-  }
-
-  if (searchKeyword.value) {
-    filtered = filtered.filter(course => 
-      course.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchKeyword.value.toLowerCase())
-    )
-  }
-
-  return filtered
+  return courseList.value.filter(course => 
+    course.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+    course.author.toLowerCase().includes(searchKeyword.value.toLowerCase())
+  )
 })
 
 // 方法
-const getStatusType = (status) => {
-  const statusTypes = {
-    'pending': 'warning',
-    'approved': 'success',
-    'rejected': 'danger'
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  try {
+    return new Date(dateString).toLocaleString()
+  } catch {
+    return dateString
   }
-  return statusTypes[status] || 'info'
 }
 
-const getStatusText = (status) => {
-  const statusTexts = {
-    'pending': '待审核',
-    'approved': '已通过',
-    'rejected': '已拒绝'
+const getFinalCoverUrl = (url) => {
+  if (!url) {
+    console.warn('封面URL为空，使用默认封面')
+    return getDefaultCoverUrl()
   }
-  return statusTexts[status] || '未知'
+
+  if (url.startsWith('http') || url.startsWith('data:')) {
+    return url
+  }
+
+  // 处理相对路径
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || window.location.origin
+  return url.startsWith('/uploads/') 
+    ? `${baseUrl}${url}`
+    : `${baseUrl}/uploads${url.startsWith('/') ? '' : '/'}${url}`
+}
+
+const getDefaultCoverUrl = () => {
+  return `${window.location.origin}/default-cover.jpg`
+}
+
+const handleImageError = (courseId, originalUrl) => {
+  console.error('封面加载失败', {
+    courseId,
+    originalUrl,
+    processedUrl: getFinalCoverUrl(originalUrl),
+    timestamp: new Date().toISOString()
+  })
+}
+
+const previewVideo = (course) => {
+  if (!course.videoUrl) {
+    ElMessage.warning('该课程没有视频内容')
+    return
+  }
+  
+  currentVideoUrl.value = course.videoUrl
+  videoDialogVisible.value = true
+}
+
+const handleVideoError = () => {
+  ElMessage.error('视频加载失败，请检查视频地址')
+  currentVideoUrl.value = ''
+  videoDialogVisible.value = false
 }
 
 const handleSizeChange = (val) => {
@@ -283,46 +286,134 @@ const viewDetail = (course) => {
 }
 
 const approveCourse = (course) => {
-  auditAction.value = 'approve'
+  isApprove.value = true
   selectedCourse.value = course
   auditForm.comment = ''
   showAuditDialog.value = true
 }
 
 const rejectCourse = (course) => {
-  auditAction.value = 'reject'
+  isApprove.value = false
   selectedCourse.value = course
   auditForm.comment = ''
   showAuditDialog.value = true
 }
 
 const submitAudit = async () => {
-  if (auditAction.value === 'reject' && !auditForm.comment.trim()) {
-    ElMessage.warning('拒绝审核时必须填写拒绝原因')
-    return
-  }
-
   try {
-    // 更新课程状态
+    // 验证表单
+    await auditFormRef.value.validate()
+    
+    loading.value = true
     const course = selectedCourse.value
-    course.status = auditAction.value === 'approve' ? 'approved' : 'rejected'
-    course.auditTime = new Date().toLocaleString()
-    course.auditComment = auditForm.comment
+    const newStatus = isApprove.value ? '已发布' : '未通过'
+    
+    const params = new URLSearchParams();
+    params.append('id', selectedCourse.value.id);
+    params.append('action', isApprove.value ? "pass" : "reject");
+    params.append('comment', auditForm.comment);
 
-    ElMessage.success(`审核${auditAction.value === 'approve' ? '通过' : '拒绝'}成功`)
-    showAuditDialog.value = false
+    const response = await axios.post('/api/course/audit', params);
+
+    if (response.data.success) {
+      // 从列表中移除已审核的课程
+      courseList.value = courseList.value.filter(c => c.id !== course.id)
+      total.value = courseList.value.length
+      
+      ElMessage.success(`审核${isApprove.value ? '通过' : '拒绝'}成功`)
+      showAuditDialog.value = false
+    } else {
+      ElMessage.error(response.data.message || '操作失败')
+    }
   } catch (error) {
-    ElMessage.error('操作失败，请重试')
+    if (error instanceof Error && !error.message.includes('validate')) {
+      ElMessage.error('操作失败，请重试')
+      console.error('审核课程失败:', error)
+    }
+  } finally {
+    loading.value = false
   }
+}
+
+const loadCourses = async () => {
+  loading.value = true
+  try {
+    // 只获取状态为"审核中"的课程
+    const response = await axios.get('/api/course/list/auditing')
+    if (response.data.success) {
+      courseList.value = response.data.data.map(course => ({
+        ...course,
+        coverUrl: course.coverUrl ? processMediaUrl('http://localhost:8080'+course.coverUrl) : undefined,
+        videoUrl: course.videoUrl ? processMediaUrl('http://localhost:8080'+course.videoUrl) : undefined,
+        status: '审核中' // 确保状态为审核中
+      }))
+      total.value = courseList.value.length
+    } else {
+      ElMessage.error(response.data.message || '加载课程列表失败')
+    }
+  } catch (error) {
+    ElMessage.error('加载课程列表失败')
+    console.error('加载课程列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const processMediaUrl = (url) => {
+  if (!url) return undefined;
+  
+  if (url.startsWith('http') || url.startsWith('data:')) return url;
+  
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || window.location.origin;
+  
+  return url.startsWith('/uploads/') 
+    ? `${baseUrl}${url}`
+    : `${baseUrl}/uploads${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
 // 生命周期
 onMounted(() => {
-  total.value = courseList.value.length
+  loadCourses()
 })
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .audit-courses {
   padding: 20px;
 }
@@ -342,11 +433,6 @@ onMounted(() => {
 .filter-section {
   display: flex;
   align-items: center;
-}
-
-.free-tag {
-  color: #67c23a;
-  font-weight: bold;
 }
 
 .pagination-wrapper {
@@ -389,56 +475,8 @@ onMounted(() => {
   margin: 0;
 }
 
-.outline-list {
-  border: 1px solid #e4e7ed;
-  border-radius: 4px;
-}
-
-.outline-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  border-bottom: 1px solid #e4e7ed;
-}
-
-.outline-item:last-child {
-  border-bottom: none;
-}
-
-.outline-number {
-  width: 30px;
-  height: 30px;
-  background: #409eff;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
-  margin-right: 15px;
-}
-
-.outline-title {
-  flex: 1;
-  color: #303133;
-}
-
-.outline-duration {
-  color: #909399;
-  font-size: 14px;
-}
-
-.audit-comment {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f5f7fa;
-  border-radius: 4px;
-}
-
-.audit-comment h4 {
-  margin: 0 0 10px 0;
-  color: #303133;
+.cover-preview {
+  margin: 15px 0;
 }
 
 .dialog-footer {
@@ -446,4 +484,48 @@ onMounted(() => {
   justify-content: flex-end;
   gap: 10px;
 }
-</style> 
+
+.image-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 45px;
+  background: #f5f7fa;
+  color: #909399;
+  font-size: 12px;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--el-color-danger);
+  padding: 20px;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.el-button {
+  font-size: 14px;
+  padding: 6px 16px;
+  min-width: 60px;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
+}
+</style>

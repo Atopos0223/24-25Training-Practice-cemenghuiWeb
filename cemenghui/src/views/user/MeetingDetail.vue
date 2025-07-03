@@ -1,22 +1,26 @@
 <template>
-  <div class="meeting-detail">
-	  <el-button @click="$router.push('/userhome/meetingmanage/list')">
-	    <el-icon><ArrowLeft /></el-icon>
-	    返回列表
-	  </el-button>
-	  
-    <el-card v-if="meeting">
-      <h3>{{ meeting.name }}</h3>
-      <el-descriptions column="2" border>
-        <el-descriptions-item label="开始时间">{{ meeting.startTime || meeting.start_time }}</el-descriptions-item>
-        <el-descriptions-item label="结束时间">{{ meeting.endTime || meeting.end_time }}</el-descriptions-item>
-        <el-descriptions-item label="创建人">{{ meeting.creator_name }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{ statusText(meeting.status) }}</el-descriptions-item>
-        <el-descriptions-item label="会议内容" :span="2">{{ meeting.content }}</el-descriptions-item>
-      </el-descriptions>
-    </el-card>
-    <el-empty v-else description="未找到会议详情" />
-  </div>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Calendar /></el-icon> 会议详情</h2>
+    <el-divider />
+    <div class="meeting-detail">
+      <el-button @click="$router.push('/userhome/meetingmanage/list')">
+        <el-icon><ArrowLeft /></el-icon>
+        返回列表
+      </el-button>
+      
+      <el-card v-if="meeting">
+        <h3>{{ meeting.name }}</h3>
+        <el-descriptions column="2" border>
+          <el-descriptions-item label="开始时间">{{ meeting.startTime || meeting.start_time }}</el-descriptions-item>
+          <el-descriptions-item label="结束时间">{{ meeting.endTime || meeting.end_time }}</el-descriptions-item>
+          <el-descriptions-item label="创建人">{{ meeting.creator_name }}</el-descriptions-item>
+          <el-descriptions-item label="状态">{{ statusText(meeting.status) }}</el-descriptions-item>
+          <el-descriptions-item label="会议内容" :span="2">{{ meeting.content }}</el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+      <el-empty v-else description="未找到会议详情" />
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -58,3 +62,32 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+</style>
