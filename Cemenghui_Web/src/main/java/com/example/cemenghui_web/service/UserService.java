@@ -4,6 +4,7 @@ import com.example.cemenghui_web.entity.User;
 import com.example.cemenghui_web.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -54,6 +55,31 @@ public class UserService {
         return true;
     }
 
+
+    // 新增用户
+    public int insertUser(User user) {
+        return userMapper.insertUser(user);
+    }
+
+    // 查询用户列表（可按条件查询）
+    public List<User> selectUserList(String username, String phone, String company, Integer status, Integer is_super, Integer gender) {
+        return userMapper.selectUserList(username, phone, company, status, is_super, gender);
+    }
+
+    // 删除单个用户
+    public int deleteUserById(Integer id) {
+        return userMapper.deleteUserById(id);
+    }
+
+    // 批量删除用户
+    public int deleteUsersByIds(List<Integer> ids) {
+        return userMapper.deleteUsersByIds(ids);
+    }
+
+    // 更新用户状态（启用/禁用）
+    public int updateUserStatus(Integer id, Integer status) {
+        return userMapper.updateUserStatus(id, status);
+    }
     public User getUserById(Integer id) {
         return userMapper.getUserById(id);
     }

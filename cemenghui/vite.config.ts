@@ -1,36 +1,35 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
   ],
   server: {
-    host: 'localhost', // 或 '0.0.0.0', 看需求
+    host: 'localhost',
     port: 5173,
-    open: true, // 启动时自动打开浏览器，方便测试
+    open: true,
+    // 新增代理配置
     proxy: {
+      '/api': {
+        target: 'http://localhost:8080',  // 后端 Spring Boot 地址
+        changeOrigin: true,               // 允许跨域
+      },
       '/findPassword': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-      }
     }
   },
-   css: {
-      postcss: undefined // 关闭 PostCSS 处理
-    },
+  css: {
+    postcss: undefined
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
-  },
+    }
+  }
 })

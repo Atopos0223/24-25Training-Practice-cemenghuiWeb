@@ -3,15 +3,11 @@
     <!-- 页面标题和操作按钮 -->
     <div class="page-header flex justify-between items-center mb-6">
       <div class="header-title flex items-center">
-        <el-icon class="text-blue-500 mr-2"><User /></el-icon>
         <h1 class="text-xl font-semibold text-gray-800">用户信息管理</h1>
       </div>
       <div class="header-actions">
         <el-button type="primary" @click="openAddUserModal" class="mr-2">
           <el-icon class="mr-1"><Plus /></el-icon> 新增用户
-        </el-button>
-        <el-button @click="handleBatchDelete" type="danger" :disabled="selectedUsers.length === 0">
-          <el-icon class="mr-1"><Delete /></el-icon> 批量删除
         </el-button>
       </div>
     </div>
@@ -25,17 +21,24 @@
         <el-form-item label="手机号码">
           <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable />
         </el-form-item>
-        <el-form-item label="所属部门">
-          <el-input v-model="filterForm.department" placeholder="请输入所属部门" clearable />
+        <el-form-item label="公司名称">
+          <el-input v-model="filterForm.company" placeholder="请输入公司名称" clearable />
+        </el-form-item>
+        <el-form-item label="角色权限">
+          <el-select v-model="filterForm.is_super" placeholder="请选择角色">
+            <el-option label="超级管理员" :value="1" />
+            <el-option label="普通用户" :value="0" />
+          </el-select>
         </el-form-item>
         <el-form-item label="用户状态">
           <el-select v-model="filterForm.status" placeholder="请选择状态">
             <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色权限">
-          <el-select v-model="filterForm.role" placeholder="请选择角色">
-            <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item label="性别">
+          <el-select v-model="filterForm.gender" placeholder="请选择性别">
+            <el-option label="男" :value="1" />
+            <el-option label="女" :value="0" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -79,16 +82,33 @@
         <el-table-column prop="nickname" label="用户昵称" min-width="120" />
         <el-table-column prop="phone" label="手机号码" min-width="150" />
         <el-table-column prop="email" label="邮箱" min-width="180" />
-        <el-table-column prop="department" label="所属部门" min-width="150" />
-        <el-table-column prop="roleName" label="角色" min-width="100" />
-        <el-table-column prop="statusName" label="状态" min-width="100">
+        <el-table-column prop="company" label="公司名称" min-width="150" />
+        <el-table-column prop="is_super" label="角色" min-width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'warning'">
-              {{ row.statusName }}
+            <el-tag :type="row.is_super === 1 ? 'danger' : 'info'">
+              {{ row.is_super === 1 ? '超级管理员' : '普通用户' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" min-width="180" />
+        <el-table-column prop="status" label="状态" min-width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+              {{ row.status === 1 ? '正常' : '禁用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="gender" label="性别" min-width="80">
+          <template #default="{ row }">
+            <el-tag :type="row.gender === 1 ? 'primary' : 'success'">
+              {{ row.gender === 1 ? '男' : '女' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="create_time" label="创建时间" min-width="180">
+          <template #default="{ row }">
+            {{ formatDateTime(row.create_time) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button size="small" @click="openEditUserModal(row)">编辑</el-button>
@@ -131,17 +151,24 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" placeholder="请输入邮箱" />
         </el-form-item>
-        <el-form-item label="所属部门" prop="department">
-          <el-input v-model="form.department" placeholder="请输入所属部门" />
+        <el-form-item label="公司名称" prop="company">
+          <el-input v-model="form.company" placeholder="请输入公司名称" />
         </el-form-item>
         <el-form-item label="用户状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择状态">
             <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色权限" prop="role">
-          <el-select v-model="form.role" placeholder="请选择角色">
-            <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item label="角色权限" prop="is_super">
+          <el-select v-model="form.is_super" placeholder="请选择角色">
+            <el-option label="超级管理员" :value="1" />
+            <el-option label="普通用户" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="性别" prop="gender">
+          <el-select v-model="form.gender" placeholder="请选择性别">
+            <el-option label="男" :value="1" />
+            <el-option label="女" :value="0" />
           </el-select>
         </el-form-item>
         <el-form-item label="密码" prop="password" v-if="!isEditing">
@@ -167,6 +194,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Plus, Delete } from '@element-plus/icons-vue';
 import { debounce } from 'lodash-es';
+import request from '@/utils/request';
 
 // 路由相关
 const router = useRouter();
@@ -187,9 +215,10 @@ const form = ref({
   nickname: '',
   phone: '',
   email: '',
-  department: '',
+  company: '',
   status: 1,
-  role: 'user',
+  is_super: 0,
+  gender: 1,
   password: '',
   confirmPassword: ''
 } as any);
@@ -198,9 +227,10 @@ const form = ref({
 const filterForm = ref({
   username: '',
   phone: '',
-  department: '',
+  company: '',
   status: '',
-  role: ''
+  is_super: '',
+  gender: ''
 } as any);
 
 // 弹窗状态
@@ -213,10 +243,9 @@ const statusOptions = ref([
   { value: 0, label: '禁用' }
 ]);
 
-const roleOptions = ref([
-  { value: 'superAdmin', label: '超级管理员' },
-  { value: 'admin', label: '管理员' },
-  { value: 'user', label: '普通用户' }
+const isSuperOptions = ref([
+  { value: 1, label: '超级管理员' },
+  { value: 0, label: '普通用户' }
 ]);
 
 // 表单验证规则
@@ -242,60 +271,37 @@ const rules = ref({
       }
     }, trigger: 'blur' }
   ],
-  role: [{ required: true, message: '请选择角色权限', trigger: 'change' }]
+  is_super: [{ required: true, message: '请选择角色权限', trigger: 'change' }],
+  gender: [{ required: true, message: '请选择性别', trigger: 'change' }]
 });
 
 const formRef = ref(null as any);
-
-// 从本地存储加载用户数据
-const loadUsersFromStorage = () => {
-  const savedUsers = localStorage.getItem('userList');
-  return savedUsers ? JSON.parse(savedUsers) : [];
-};
-
-// 保存用户数据到本地存储
-const saveUsersToStorage = (users: any[]) => {
-  localStorage.setItem('userList', JSON.stringify(users));
-};
 
 // 加载用户列表
 const fetchUserList = async (page: number = currentPage.value, size: number = pageSize.value) => {
   loading.value = true;
   try {
-    // 从本地存储获取用户数据
-    const allUsers = loadUsersFromStorage();
-    
-    // 应用过滤条件
-    const filteredData = allUsers.filter(user => (
-      (!filterForm.value.username || user.username.includes(filterForm.value.username)) &&
-      (!filterForm.value.phone || user.phone.includes(filterForm.value.phone)) &&
-      (!filterForm.value.department || user.department.includes(filterForm.value.department)) &&
-      (filterForm.value.status === '' || user.status === filterForm.value.status) &&
-      (filterForm.value.role === '' || user.role === filterForm.value.role)
-    ));
-    
-    // 分页处理
-    const start = (page - 1) * size;
-    const end = start + size;
-    const paginatedData = filteredData.slice(start, end);
-    
-    // 更新列表数据
-    userList.value = paginatedData.map(item => ({
-      ...item,
-      roleName: item.role === 'superAdmin' ? '超级管理员' : item.role === 'admin' ? '管理员' : '普通用户',
-      statusName: item.status === 1 ? '正常' : '禁用'
-    }));
-    total.value = filteredData.length;
-    
-    // 处理空状态
-    if (paginatedData.length === 0) {
-      if (allUsers.length > 0 && Object.values(filterForm.value).some(value => value !== '')) {
-        ElMessage.warning('没有找到匹配的用户');
-      } else if (allUsers.length === 0) {
-        ElMessage.info('暂无用户数据，请添加新用户');
-      }
+    const params: any = {
+      username: filterForm.value.username,
+      phone: filterForm.value.phone,
+      company: filterForm.value.company,
+      status: filterForm.value.status,
+      is_super: filterForm.value.is_super,
+      gender: filterForm.value.gender
+    };
+    const res = await request.get('http://localhost:8080/userList', {
+      params,
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    if (res.data.code === 200) {
+      const allUsers = res.data.data || [];
+      userList.value = allUsers.slice().sort((a, b) => a.id - b.id);
+      total.value = allUsers.length;
+    } else {
+      userList.value = [];
+      total.value = 0;
+      ElMessage.error(res.data.msg || '获取用户列表失败');
     }
-    
   } catch (error) {
     console.error('获取用户列表失败', error);
     ElMessage.error('获取用户列表失败');
@@ -323,9 +329,10 @@ const resetFilter = () => {
   filterForm.value = {
     username: '',
     phone: '',
-    department: '',
+    company: '',
     status: '',
-    role: ''
+    is_super: '',
+    gender: ''
   };
   currentPage.value = 1; // 重置为第一页
   fetchUserList();
@@ -359,14 +366,17 @@ const getActiveFilters = () => {
   if (filterForm.value.phone) {
     activeFilters.push(`手机号码: ${filterForm.value.phone}`);
   }
-  if (filterForm.value.department) {
-    activeFilters.push(`所属部门: ${filterForm.value.department}`);
+  if (filterForm.value.company) {
+    activeFilters.push(`公司名称: ${filterForm.value.company}`);
   }
   if (filterForm.value.status !== '') {
     activeFilters.push(`用户状态: ${filterForm.value.status === 1 ? '正常' : '禁用'}`);
   }
-  if (filterForm.value.role) {
-    activeFilters.push(`角色权限: ${filterForm.value.role === 'superAdmin' ? '超级管理员' : filterForm.value.role === 'admin' ? '管理员' : '普通用户'}`);
+  if (filterForm.value.is_super !== '') {
+    activeFilters.push(`角色权限: ${filterForm.value.is_super == 1 ? '超级管理员' : '普通用户'}`);
+  }
+  if (filterForm.value.gender !== '') {
+    activeFilters.push(`性别: ${filterForm.value.gender === 1 ? '男' : '女'}`);
   }
   
   return activeFilters;
@@ -378,12 +388,14 @@ const removeFilter = (filterText: string) => {
     filterForm.value.username = '';
   } else if (filterText.includes('手机号码')) {
     filterForm.value.phone = '';
-  } else if (filterText.includes('所属部门')) {
-    filterForm.value.department = '';
+  } else if (filterText.includes('公司名称')) {
+    filterForm.value.company = '';
   } else if (filterText.includes('用户状态')) {
     filterForm.value.status = '';
   } else if (filterText.includes('角色权限')) {
-    filterForm.value.role = '';
+    filterForm.value.is_super = '';
+  } else if (filterText.includes('性别')) {
+    filterForm.value.gender = '';
   }
   
   // 刷新列表
@@ -400,9 +412,10 @@ const openAddUserModal = () => {
     nickname: '',
     phone: '',
     email: '',
-    department: '',
+    company: '',
     status: 1,
-    role: 'user',
+    is_super: 0,
+    gender: 1,
     password: '',
     confirmPassword: ''
   };
@@ -421,9 +434,10 @@ const openEditUserModal = (row: any) => {
     nickname: row.nickname,
     phone: row.phone,
     email: row.email,
-    department: row.department,
+    company: row.company,
     status: row.status,
-    role: row.role,
+    is_super: row.is_super,
+    gender: row.gender,
     password: '',
     confirmPassword: ''
   };
@@ -431,63 +445,43 @@ const openEditUserModal = (row: any) => {
 };
 
 // 提交表单
+const statusMap = { '正常': 1, '禁用': 0, 1: 1, 0: 0 };
 const submitForm = () => {
   formRef.value?.validate(async (valid: boolean) => {
     if (valid) {
       try {
-        // 模拟API请求
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({
-              code: 200,
-              message: isEditing.value ? '更新用户成功' : '创建用户成功'
-            });
-          }, 500);
-        });
-
-        // 获取当前用户数据
-        const allUsers = loadUsersFromStorage();
-        
+        const payload = {
+          ...form.value,
+          status: statusMap[form.value.status]
+        };
+        let res;
         if (isEditing.value) {
-          // 更新用户
-          const index = allUsers.findIndex(user => user.id === form.value.id);
-          if (index !== -1) {
-            allUsers[index] = {
-              ...allUsers[index],
-              ...form.value,
-              roleName: form.value.role === 'superAdmin' ? '超级管理员' : form.value.role === 'admin' ? '管理员' : '普通用户',
-              statusName: form.value.status === 1 ? '正常' : '禁用'
-            };
+          res = await request.post('/updateUser', { ...payload, id: form.value.id });
+        } else {
+          res = await request.post('/addUser', payload);
+        }
+        if (res.data.code === 200) {
+          if (isEditing.value) {
+            ElMessage.success('更新用户成功');
+            dialogVisible.value = false;
+            fetchUserList(currentPage.value);
+          } else {
+            ElMessage.success('创建用户成功');
+            dialogVisible.value = false;
+            currentPage.value = 1;
+            fetchUserList(1);
           }
         } else {
-          // 创建新用户
-          const newId = allUsers.length > 0 ? Math.max(...allUsers.map(user => user.id)) + 1 : 1;
-          allUsers.push({
-            ...form.value,
-            id: newId,
-            createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            roleName: form.value.role === 'superAdmin' ? '超级管理员' : form.value.role === 'admin' ? '管理员' : '普通用户',
-            statusName: form.value.status === 1 ? '正常' : '禁用'
-          });
+          ElMessage.error(res.data.msg || '操作失败');
         }
-        
-        // 保存到本地存储
-        saveUsersToStorage(allUsers);
-        
-        // 刷新列表
-        ElMessage.success(isEditing.value ? '更新用户成功' : '创建用户成功');
-        dialogVisible.value = false;
-        fetchUserList(currentPage.value);
-        
       } catch (error) {
-        console.error('操作失败', error);
         ElMessage.error('操作失败');
       }
     }
   });
 };
 
-// 处理删除
+// 删除单个用户
 const handleDelete = (row: any) => {
   ElMessageBox.confirm(`确定要删除用户 ${row.nickname} 吗？`, '提示', {
     confirmButtonText: '确定',
@@ -495,83 +489,19 @@ const handleDelete = (row: any) => {
     type: 'warning'
   }).then(async () => {
     try {
-      // 模拟API请求
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            code: 200,
-            message: '删除用户成功'
-          });
-        }, 500);
-      });
-      
-      // 获取当前用户数据
-      const allUsers = loadUsersFromStorage();
-      
-      // 删除用户
-      const updatedUsers = allUsers.filter(user => user.id !== row.id);
-      
-      // 保存到本地存储
-      saveUsersToStorage(updatedUsers);
-      
-      // 刷新列表
-      ElMessage.success('删除用户成功');
-      fetchUserList(currentPage.value);
-      
+      const res = await request.delete(`/deleteUser/${row.id}`);
+      if (res.data.code === 200) {
+        ElMessage.success('删除用户成功');
+        fetchUserList(currentPage.value);
+      } else {
+        ElMessage.error(res.data.msg || '删除用户失败');
+      }
     } catch (error) {
       console.error('删除用户失败', error);
       ElMessage.error('删除用户失败');
     }
   }).catch(() => {
     ElMessage.info('已取消删除');
-  });
-};
-
-// 批量删除
-const handleBatchDelete = () => {
-  if (selectedUsers.value.length === 0) {
-    ElMessage.warning('请先选择要删除的用户');
-    return;
-  }
-
-  const userNames = selectedUsers.value.map(user => user.nickname).join(', ');
-  ElMessageBox.confirm(`确定要批量删除 ${userNames} 吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    try {
-      // 模拟API请求
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            code: 200,
-            message: `成功删除 ${selectedUsers.value.length} 个用户`
-          });
-        }, 500);
-      });
-      
-      // 获取当前用户数据
-      const allUsers = loadUsersFromStorage();
-      
-      // 批量删除用户
-      const userIdsToDelete = selectedUsers.value.map(user => user.id);
-      const updatedUsers = allUsers.filter(user => !userIdsToDelete.includes(user.id));
-      
-      // 保存到本地存储
-      saveUsersToStorage(updatedUsers);
-      
-      // 刷新列表
-      ElMessage.success(`成功删除 ${selectedUsers.value.length} 个用户`);
-      selectedUsers.value = [];
-      fetchUserList(currentPage.value);
-      
-    } catch (error) {
-      console.error('批量删除失败', error);
-      ElMessage.error('批量删除失败');
-    }
-  }).catch(() => {
-    ElMessage.info('已取消批量删除');
   });
 };
 
@@ -589,6 +519,11 @@ onMounted(() => {
 watch(() => route.path, () => {
   fetchUserList();
 });
+
+function formatDateTime(val) {
+  if (!val) return '';
+  return val.replace('T', ' ').slice(0, 19);
+}
 </script>
 
 <style scoped>
