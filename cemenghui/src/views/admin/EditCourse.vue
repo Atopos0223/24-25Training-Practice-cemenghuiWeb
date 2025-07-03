@@ -1,72 +1,76 @@
 <template>
-  <div class="edit-course-container">
-    <el-button type="primary" @click="handleBack" class="back-btn">
-      <el-icon><ArrowLeft /></el-icon>
-      返回列表
-    </el-button>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 编辑课程</h2>
+    <el-divider />
+    <div class="edit-course">
+      <el-button type="primary" @click="handleBack" class="back-btn">
+        <el-icon><ArrowLeft /></el-icon>
+        返回列表
+      </el-button>
 
-    <el-form :model="form" label-width="100px" v-loading="loading">
-      <el-form-item label="课程标题" required>
-        <el-input v-model="form.title" />
-      </el-form-item>
+      <el-form :model="form" label-width="120px" v-loading="loading">
+        <el-form-item label="课程标题" required>
+          <el-input v-model="form.title" />
+        </el-form-item>
 
-      <el-form-item label="作者" required>
-        <el-input v-model="form.author" />
-      </el-form-item>
+        <el-form-item label="作者" required>
+          <el-input v-model="form.author" />
+        </el-form-item>
 
-      <el-form-item label="状态">
-        <el-select v-model="form.status">
-          <el-option label="已发布" value="已发布" />
-          <el-option label="审核中" value="审核中" />
-          <el-option label="未通过" value="未通过" />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="form.status">
+            <el-option label="已发布" value="已发布" />
+            <el-option label="审核中" value="审核中" />
+            <el-option label="未通过" value="未通过" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item label="课程封面">
-        <el-upload
-          action="#"
-          :auto-upload="false"
-          :on-change="handleCoverChange"
-          :show-file-list="false"
-        >
-          <el-button type="primary">选择封面</el-button>
-          <span v-if="coverPreview" class="preview-tip">已选择新封面</span>
-        </el-upload>
-        <el-image
-          v-if="form.coverUrl && !coverPreview"
-          :src="getFinalUrl(form.coverUrl)"
-          style="width: 200px; margin-top: 10px"
-          fit="cover"
-        />
-      </el-form-item>
+        <el-form-item label="课程封面">
+          <el-upload
+            action="#"
+            :auto-upload="false"
+            :on-change="handleCoverChange"
+            :show-file-list="false"
+          >
+            <el-button type="primary">选择封面</el-button>
+            <span v-if="coverPreview" class="preview-tip">已选择新封面</span>
+          </el-upload>
+          <el-image
+            v-if="form.coverUrl && !coverPreview"
+            :src="getFinalUrl(form.coverUrl)"
+            style="width: 200px; margin-top: 10px"
+            fit="cover"
+          />
+        </el-form-item>
 
-      <el-form-item label="课程视频">
-        <el-upload
-          action="#"
-          :auto-upload="false"
-          :on-change="handleVideoChange"
-          :show-file-list="false"
-        >
-          <el-button type="primary">选择视频</el-button>
-          <span v-if="videoFile" class="preview-tip">已选择新视频</span>
-        </el-upload>
-        <video
-          v-if="form.videoUrl && !videoFile"
-          controls
-          style="width: 300px; margin-top: 10px"
-          :src="getFinalUrl(form.videoUrl)"
-        />
-      </el-form-item>
+        <el-form-item label="课程视频">
+          <el-upload
+            action="#"
+            :auto-upload="false"
+            :on-change="handleVideoChange"
+            :show-file-list="false"
+          >
+            <el-button type="primary">选择视频</el-button>
+            <span v-if="videoFile" class="preview-tip">已选择新视频</span>
+          </el-upload>
+          <video
+            v-if="form.videoUrl && !videoFile"
+            controls
+            style="width: 300px; margin-top: 10px"
+            :src="getFinalUrl(form.videoUrl)"
+          />
+        </el-form-item>
 
-      <el-form-item label="课程简介">
-        <el-input v-model="form.intro" type="textarea" rows="4" />
-      </el-form-item>
+        <el-form-item label="课程简介">
+          <el-input v-model="form.intro" type="textarea" rows="4" />
+        </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="submitForm">保存修改</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">保存修改</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+  </el-card>
 </template>
 
 <script setup>
@@ -74,7 +78,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft } from '@element-plus/icons-vue'
+import { ArrowLeft, Notebook } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -199,10 +203,37 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.edit-course-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-input {
+  border-radius: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
 }
 .back-btn {
   margin-bottom: 20px;

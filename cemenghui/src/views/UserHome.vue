@@ -86,6 +86,8 @@
 
       <!-- 右侧Main -->
       <main class="main-content">
+        <h2 class="main-title"><el-icon><User /></el-icon> 用户首页</h2>
+        <el-divider />
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -169,6 +171,15 @@ const logout = () => {
   padding: 20px;
   overflow-y: auto;
   background: #f5f7fa;
+}
+
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* 过渡动画 */

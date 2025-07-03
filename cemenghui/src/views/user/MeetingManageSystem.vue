@@ -1,4 +1,61 @@
 <template>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Calendar /></el-icon> 会议管理系统</h2>
+    <el-divider />
+    <div class="meeting-manage-system">
+      <el-tabs v-model="activeTab">
+        <el-tab-pane label="创建会议" name="create">
+          <el-form :model="meetingForm" label-width="120px">
+            <el-form-item label="会议名称">
+              <el-input v-model="meetingForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="开始时间">
+              <el-date-picker
+                v-model="meetingForm.startTime"
+                type="datetime"
+                placeholder="选择开始时间"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="结束时间">
+              <el-date-picker
+                v-model="meetingForm.endTime"
+                type="datetime"
+                placeholder="选择结束时间"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="创建人">
+              <el-input v-model="meetingForm.creator"></el-input>
+            </el-form-item>
+            <el-form-item label="会议内容">
+              <el-input type="textarea" v-model="meetingForm.content"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="createMeeting">创建</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        
+        <el-tab-pane label="会议列表" name="list">
+          <el-row class="filter-row">
+            <el-col :span="6">
+              <el-date-picker
+                v-model="dateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+              ></el-date-picker>
+            </el-col>
+            <el-col :span="6">
+              <el-input v-model="searchName" placeholder="会议名称"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-input v-model="searchCreator" placeholder="创建人"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button type="primary" @click="filterMeetings">筛选</el-button>
+            </el-col>
+          </el-row>
   <div class="meeting-manage-system">
     <h2>Web端会议管理子系统</h2>
     <el-tabs v-model="activeTab">

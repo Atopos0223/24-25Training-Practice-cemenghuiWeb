@@ -1,22 +1,24 @@
 <template>
-  <div class="audit-courses">
-    <div class="page-header">
-      <h2>审核课程</h2>
-      <div class="filter-section">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索课程名称或作者"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 审核课程</h2>
+    <el-divider />
+    <div class="audit-courses">
+      <div class="page-header">
+        <h2>审核课程</h2>
+        <div class="filter-section">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索课程名称或作者"
+            style="width: 250px"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
       </div>
-    </div>
 
-    <el-card>
       <el-table :data="filteredCourses" style="width: 100%" v-loading="loading">
         <el-table-column 
           type="index"
@@ -78,7 +80,6 @@
               size="small" 
               type="success" 
               @click="approveCourse(scope.row)"
-			
             >
               通过
             </el-button>
@@ -86,7 +87,6 @@
               size="small" 
               type="danger" 
               @click="rejectCourse(scope.row)"
-
             >
               拒绝
             </el-button>
@@ -105,7 +105,7 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 视频预览对话框 -->
     <el-dialog v-model="videoDialogVisible" title="视频预览" width="70%">
@@ -182,13 +182,13 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Picture, VideoCameraFilled } from '@element-plus/icons-vue'
+import { Search, Picture, VideoCameraFilled, Notebook } from '@element-plus/icons-vue'
 import axios from 'axios'
 
 // 响应式数据
@@ -388,6 +388,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .audit-courses {
   padding: 20px;
 }

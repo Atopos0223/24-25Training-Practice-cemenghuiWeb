@@ -1,43 +1,47 @@
 <template>
-  <div class="add-course">
-    <el-form :model="form" label-width="120px">
-      <el-form-item label="课程名称" required>
-        <el-input v-model="form.title" />
-      </el-form-item>
-      <el-form-item label="作者" required>
-        <el-input v-model="form.author" />
-      </el-form-item>
-      <el-form-item label="课程封面" required>
-        <el-upload
-          :auto-upload="false"
-          :file-list="coverFileList"
-          :on-remove="handleCoverRemove"
-          :on-change="handleCoverChange"
-          :limit="1"
-          accept="image/*">
-          <el-button type="primary">上传封面</el-button>
-        </el-upload>
-      </el-form-item>
-      <el-form-item label="课程简介">
-        <el-input v-model="form.intro" type="textarea" rows="4" />
-      </el-form-item>
-      <el-form-item label="课程视频">
-        <el-upload
-          :auto-upload="false"
-          :file-list="videoFileList"
-          :on-remove="handleVideoRemove"
-          :on-change="handleVideoChange"
-          :limit="1"
-          accept="video/*">
-          <el-button type="primary">上传视频</el-button>
-        </el-upload>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
-        <el-button @click="router.push('/userhome/coursemanage/list')">取消</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 添加课程</h2>
+    <el-divider />
+    <div class="add-course">
+      <el-form :model="form" label-width="120px">
+        <el-form-item label="课程名称" required>
+          <el-input v-model="form.title" />
+        </el-form-item>
+        <el-form-item label="作者" required>
+          <el-input v-model="form.author" />
+        </el-form-item>
+        <el-form-item label="课程封面" required>
+          <el-upload
+            :auto-upload="false"
+            :file-list="coverFileList"
+            :on-remove="handleCoverRemove"
+            :on-change="handleCoverChange"
+            :limit="1"
+            accept="image/*">
+            <el-button type="primary">上传封面</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="课程简介">
+          <el-input v-model="form.intro" type="textarea" rows="4" />
+        </el-form-item>
+        <el-form-item label="课程视频">
+          <el-upload
+            :auto-upload="false"
+            :file-list="videoFileList"
+            :on-remove="handleVideoRemove"
+            :on-change="handleVideoChange"
+            :limit="1"
+            accept="video/*">
+            <el-button type="primary">上传视频</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submit">提交</el-button>
+          <el-button @click="router.push('/userhome/coursemanage/list')">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -110,3 +114,38 @@ const submit = async () => {
   }
 }
 </script>
+
+<style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-input {
+  border-radius: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+</style>

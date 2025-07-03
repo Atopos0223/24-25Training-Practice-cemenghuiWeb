@@ -1,4 +1,89 @@
 <template>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 课程管理系统</h2>
+    <el-divider />
+    <div class="course-manage-system">
+      <h2>Web端课程管理子系统</h2>
+      <el-tabs v-model="activeTab">
+        <el-tab-pane label="添加课程" name="add">
+          <el-form :model="courseForm" label-width="120px">
+            <el-form-item label="课程名称">
+              <el-input v-model="courseForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="课程封面">
+              <el-upload
+                class="upload-demo"
+                action="#"
+                :auto-upload="false"
+                :on-change="handleCoverChange"
+                :on-remove="handleRemove"
+                :file-list="coverFileList"
+              >
+                <el-button type="primary">选取文件</el-button>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="课程简介">
+              <el-input type="textarea" v-model="courseForm.intro"></el-input>
+            </el-form-item>
+            <el-form-item label="课程排序">
+              <el-input-number v-model="courseForm.sort" :min="0"></el-input-number>
+            </el-form-item>
+            <el-form-item label="课程视频">
+              <el-upload
+                class="upload-demo"
+                action="#"
+                :auto-upload="false"
+                :on-change="handleVideoChange"
+                :file-list="videoFileList"
+              >
+                <el-button type="primary">选取视频</el-button>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="作者">
+              <el-input v-model="courseForm.author"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="addCourse">添加</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        
+        <el-tab-pane label="课程列表" name="list">
+          <el-input 
+            v-model="searchKey" 
+            placeholder="请输入课程名称搜索" 
+            style="width: 300px; margin-bottom: 15px;"
+          />
+          <el-table :data="filteredCourseList" border style="width: 100%">
+            <el-table-column prop="name" label="课程名称"></el-table-column>
+            <el-table-column prop="author" label="作者"></el-table-column>
+            <el-table-column prop="sort" label="排序" width="80"></el-table-column>
+            <el-table-column prop="status" label="状态" width="120">
+              <template #default="{row}">
+                <el-tag :type="getStatusTagType(row.status)">{{ row.status }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="280">
+              <template #default="scope">
+                <el-button type="primary" size="small" @click="viewCourse(scope.row)">查看</el-button>
+                <el-button type="warning" size="small" @click="editCourse(scope.row)" 
+                  v-if="scope.row.status !== '已发布'">编辑</el-button>
+                <el-button type="danger" size="small" @click="deleteCourse(scope.row)" 
+                  v-if="scope.row.status !== '已发布'">删除</el-button>
+                <el-button type="success" size="small" @click="submitAudit(scope.row)" 
+                  v-if="scope.row.status === '未审核'">提交审核</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        
+        <el-tab-pane label="课程详情" name="detail" v-if="activeCourse">
+          <el-card>
+            <h3>{{ activeCourse.name }}</h3>
+            <div class="course-info">
+              <div class="cover">
+                <img :src="activeCourse.coverUrl" alt="课程封面" width="200">
+              </div>
   <div class="course-manage-system">
     <h2>Web端课程管理子系统</h2>
     <el-tabs v-model="activeTab">

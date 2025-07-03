@@ -1,118 +1,118 @@
 <template>
-  <div class="permission-management">
-    <div class="page-header">
-      <h2>权限管理</h2>
-    </div>
-
-    <!-- 用户权限列表 -->
-    <el-card class="user-list-card">
-      <template #header>
-        <div class="card-header">
-          <span>用户权限列表</span>
-          <el-input
-            v-model="searchKeyword"
-            placeholder="搜索用户名或邮箱"
-            style="width: 300px"
-            clearable
-            @input="handleSearch"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </div>
-      </template>
-
-      <el-table :data="filteredUsers" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="email" label="邮箱" width="200" />
-        <el-table-column prop="is_super" label="角色" width="120">
-          <template #default="scope">
-            <el-tag :type="scope.row.is_super === 1 ? 'danger' : 'info'">
-              {{ getRoleName(scope.row.is_super) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
-              {{ scope.row.status === 1 ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" min-width="180">
-          <template #default="{ row }">
-            {{ formatDateTime(row.create_time) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200">
-          <template #default="scope">
-            <el-button 
-              size="small" 
-              type="danger" 
-              @click="toggleUserStatus(scope.row)"
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><User /></el-icon> 权限管理</h2>
+    <el-divider />
+    <div class="permission-management">
+      <!-- 用户权限列表 -->
+      <el-card class="user-list-card">
+        <template #header>
+          <div class="card-header">
+            <span>用户权限列表</span>
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索用户名或邮箱"
+              style="width: 300px"
+              clearable
+              @input="handleSearch"
             >
-              {{ scope.row.status === 1 ? '禁用' : '启用' }}
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+          </div>
+        </template>
 
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
+        <el-table :data="filteredUsers" style="width: 100%" v-loading="loading">
+          <el-table-column prop="id" label="ID" width="80" />
+          <el-table-column prop="username" label="用户名" width="120" />
+          <el-table-column prop="email" label="邮箱" width="200" />
+          <el-table-column prop="is_super" label="角色" width="120">
+            <template #default="scope">
+              <el-tag :type="scope.row.is_super === 1 ? 'danger' : 'info'">
+                {{ getRoleName(scope.row.is_super) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
+                {{ scope.row.status === 1 ? '启用' : '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="create_time" label="创建时间" min-width="180">
+            <template #default="{ row }">
+              {{ formatDateTime(row.create_time) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200">
+            <template #default="scope">
+              <el-button 
+                size="small" 
+                type="danger" 
+                @click="toggleUserStatus(scope.row)"
+              >
+                {{ scope.row.status === 1 ? '禁用' : '启用' }}
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
-    <!-- 添加/编辑用户对话框 -->
-    <el-dialog
-      v-model="showAddUserDialog"
-      :title="editingUser ? '编辑用户' : '添加用户'"
-      width="500px"
-    >
-      <el-form :model="userForm" :rules="userRules" ref="userFormRef" label-width="100px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username" placeholder="请输入用户名" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" placeholder="请输入邮箱" />
-        </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="userForm.role" placeholder="请选择角色" style="width: 100%">
-            <el-option label="普通用户" value="user" />
-            <el-option label="管理员" value="admin" />
-            <el-option label="超级管理员" value="super_admin" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="userForm.status">
-            <el-radio label="active">启用</el-radio>
-            <el-radio label="inactive">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="showAddUserDialog = false">取消</el-button>
-          <el-button type="primary" @click="saveUser">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+        <div class="pagination-wrapper">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </el-card>
+
+      <!-- 添加/编辑用户对话框 -->
+      <el-dialog
+        v-model="showAddUserDialog"
+        :title="editingUser ? '编辑用户' : '添加用户'"
+        width="500px"
+      >
+        <el-form :model="userForm" :rules="userRules" ref="userFormRef" label-width="100px">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="userForm.username" placeholder="请输入用户名" />
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="userForm.email" placeholder="请输入邮箱" />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="userForm.role" placeholder="请选择角色" style="width: 100%">
+              <el-option label="普通用户" value="user" />
+              <el-option label="管理员" value="admin" />
+              <el-option label="超级管理员" value="super_admin" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="状态" prop="status">
+            <el-radio-group v-model="userForm.status">
+              <el-radio label="active">启用</el-radio>
+              <el-radio label="inactive">禁用</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="showAddUserDialog = false">取消</el-button>
+            <el-button type="primary" @click="saveUser">确定</el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+  </el-card>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search } from '@element-plus/icons-vue'
+import { Plus, Search, User } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
 // 响应式数据
@@ -283,6 +283,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .permission-management {
   padding: 20px;
 }

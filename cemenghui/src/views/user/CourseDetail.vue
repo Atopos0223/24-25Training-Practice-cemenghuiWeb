@@ -1,65 +1,69 @@
 <template>
-  <div class="course-detail-container">
-    <!-- 返回按钮 - 修复点击卡死问题 -->
-    <el-button 
-      type="primary" 
-      @click="handleBack"
-      class="back-btn"
-    >
-      <el-icon><ArrowLeft /></el-icon>
-      返回列表
-    </el-button>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Notebook /></el-icon> 课程详情</h2>
+    <el-divider />
+    <div class="course-detail">
+      <!-- 返回按钮 - 修复点击卡死问题 -->
+      <el-button 
+        type="primary" 
+        @click="handleBack"
+        class="back-btn"
+      >
+        <el-icon><ArrowLeft /></el-icon>
+        返回列表
+      </el-button>
 
-    <!-- 主内容区域 -->
-    <div v-if="loading" class="loading-state">
-      <el-icon class="loading-icon"><Loading /></el-icon>
-      <span>课程加载中...</span>
-    </div>
+      <!-- 主内容区域 -->
+      <div v-if="loading" class="loading-state">
+        <el-icon class="loading-icon"><Loading /></el-icon>
+        <span>课程加载中...</span>
+      </div>
 
-    <div v-else-if="course" class="course-content">
-      <!-- 封面和基本信息 -->
-      <div class="course-header">
-        <el-image
-          :src="getFinalUrl(course.coverUrl)"
-          style="width: 300px; height: 180px;"
-        >
-          <template #error>
-            <div>封面加载失败</div>
-          </template>
-        </el-image>
+      <div v-else-if="course" class="course-content">
+        <!-- 封面和基本信息 -->
+        <div class="course-header">
+          <el-image
+            :src="getFinalUrl(course.coverUrl)"
+            style="width: 300px; height: 180px;"
+          >
+            <template #error>
+              <div>封面加载失败</div>
+            </template>
+          </el-image>
 
-        <div class="course-meta">
-          <h2 class="course-title">标题:{{ course.title || '未命名课程' }}</h2>
-          <p class="course-author">作者: {{ course.author || '未知' }}</p>
-          <el-tag :type="getStatusTagType(course.status)">
-            {{ course.status || '未知状态' }}
-          </el-tag>
-          <p class="course-desc">简介:{{ course.intro || '暂无课程简介' }}</p>
+          <div class="course-meta">
+            <h2 class="course-title">标题:{{ course.title || '未命名课程' }}</h2>
+            <p class="course-author">作者: {{ course.author || '未知' }}</p>
+            <el-tag :type="getStatusTagType(course.status)">
+              {{ course.status || '未知状态' }}
+            </el-tag>
+            <p class="course-desc">简介:{{ course.intro || '暂无课程简介' }}</p>
+          </div>
+        </div>
+
+        <!-- 视频播放器 - 修复视频不显示问题 -->
+        <div class="video">
+          <h3>课程视频</h3>
+          <video controls width="100%">
+            <source :src="getFinalUrl(course.videoUrl)" type="video/mp4">
+            您的浏览器不支持视频播放。
+          </video>
         </div>
       </div>
 
-      <!-- 视频播放器 - 修复视频不显示问题 -->
-    <div class="video">
-      <h3>课程视频</h3>
-      <video controls width="100%">
-        <source :src="getFinalUrl(course.videoUrl)" type="video/mp4">
-        您的浏览器不支持视频播放。
-      </video>
+      <!-- 错误状态 -->
+      <div v-else class="error-state">
+        <el-alert
+          title="课程加载失败"
+          type="error"
+          :closable="false"
+          center
+        >
+          <el-button type="primary" @click="retryLoad">重新加载</el-button>
+        </el-alert>
+      </div>
     </div>
-    </div>
-
-    <!-- 错误状态 -->
-    <div v-else class="error-state">
-      <el-alert
-        title="课程加载失败"
-        type="error"
-        :closable="false"
-        center
-      >
-        <el-button type="primary" @click="retryLoad">重新加载</el-button>
-      </el-alert>
-    </div>
-  </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +71,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, Picture, Loading } from '@element-plus/icons-vue'
+import { ArrowLeft, Picture, Loading, Notebook } from '@element-plus/icons-vue'
 
 interface Course {
   id: number
@@ -199,6 +203,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
 .course-detail-container {
   max-width: 1000px;
   margin: 0 auto;

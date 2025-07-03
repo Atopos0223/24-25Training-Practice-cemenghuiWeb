@@ -1,108 +1,112 @@
 <template>
   <div class="manage-courses">
-    <div class="page-header">
-      <h2>管理课程</h2>
-      <div class="filter-section">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索课程名称或作者"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
-      </div>
-    </div>
-
-    <el-card>
-      <el-table :data="paginatedCourses" style="width: 100%" v-loading="loading">
-        <el-table-column 
-          type="index"
-          label="序号"
-          width="80"
-          :index="(index) => index + 1"
-        />
-        <el-table-column prop="title" label="课程名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="author" label="作者" width="120" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag 
-              :type="getStatusTagType(scope.row.status)"
+    <el-card class="main-card" shadow="hover">
+      <h2 class="main-title"><el-icon><Notebook /></el-icon> 课程管理</h2>
+      <el-divider />
+      <div class="courses-management">
+        <div class="page-header">
+          <h2>管理课程</h2>
+          <div class="filter-section">
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索课程名称或作者"
+              style="width: 250px"
+              clearable
             >
-              {{ scope.row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="提交时间" width="180">
-          <template #default="scope">
-            {{ formatDate(scope.row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="封面" width="120">
-          <template #default="scope">
-            <el-image 
-              :src="getFinalCoverUrl(scope.row.coverUrl)"
-              :preview-src-list="[getFinalCoverUrl(scope.row.coverUrl)]"
-              style="width: 80px; height: 45px"
-              fit="cover"
-              @error="handleImageError(scope.row.id, scope.row.coverUrl)"
-            >
-              <template #error>
-                <div class="image-slot">
-                  <el-icon><Picture /></el-icon>
-                  <span>封面加载失败</span>
-                </div>
+              <template #prefix>
+                <el-icon><Search /></el-icon>
               </template>
-            </el-image>
-          </template>
-        </el-table-column>
-        <el-table-column label="视频" width="120">
-          <template #default="scope">
-            <div class="video-container">
-              <el-button 
-                type="primary" 
-                size="small" 
-                @click="previewVideo(scope.row)"
-                :disabled="!scope.row.videoUrl"
-              >
-                {{ scope.row.videoUrl ? '预览视频' : '无视频' }}
-              </el-button>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              size="small" 
-              type="primary" 
-              @click="editCourse(scope.row)"
-            >
-              编辑
-            </el-button>
-            <el-button 
-              size="small" 
-              type="danger" 
-              @click="deleteCourse(scope.row)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+            </el-input>
+          </div>
+        </div>
 
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-table :data="paginatedCourses" style="width: 100%" v-loading="loading">
+          <el-table-column 
+            type="index"
+            label="序号"
+            width="80"
+            :index="(index) => index + 1"
+          />
+          <el-table-column prop="title" label="课程名称" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="author" label="作者" width="120" />
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="scope">
+              <el-tag 
+                :type="getStatusTagType(scope.row.status)"
+              >
+                {{ scope.row.status }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="提交时间" width="180">
+            <template #default="scope">
+              {{ formatDate(scope.row.createTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="封面" width="120">
+            <template #default="scope">
+              <el-image 
+                :src="getFinalCoverUrl(scope.row.coverUrl)"
+                :preview-src-list="[getFinalCoverUrl(scope.row.coverUrl)]"
+                style="width: 80px; height: 45px"
+                fit="cover"
+                @error="handleImageError(scope.row.id, scope.row.coverUrl)"
+              >
+                <template #error>
+                  <div class="image-slot">
+                    <el-icon><Picture /></el-icon>
+                    <span>封面加载失败</span>
+                  </div>
+                </template>
+              </el-image>
+            </template>
+          </el-table-column>
+          <el-table-column label="视频" width="120">
+            <template #default="scope">
+              <div class="video-container">
+                <el-button 
+                  type="primary" 
+                  size="small" 
+                  @click="previewVideo(scope.row)"
+                  :disabled="!scope.row.videoUrl"
+                >
+                  {{ scope.row.videoUrl ? '预览视频' : '无视频' }}
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200" fixed="right">
+            <template #default="scope">
+              <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
+              <el-button 
+                size="small" 
+                type="primary" 
+                @click="editCourse(scope.row)"
+              >
+                编辑
+              </el-button>
+              <el-button 
+                size="small" 
+                type="danger" 
+                @click="deleteCourse(scope.row)"
+              >
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="pagination-wrapper">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
     </el-card>
 
@@ -163,7 +167,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Picture, VideoCameraFilled } from '@element-plus/icons-vue'
+import { Search, Picture, VideoCameraFilled, Notebook } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 // 响应式数据
@@ -438,5 +442,42 @@ onMounted(() => {
   align-items: center;
   color: var(--el-color-danger);
   padding: 20px;
+}
+
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
 }
 </style>

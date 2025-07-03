@@ -1,198 +1,202 @@
 <template>
-  <div class="info-management-page">
-    <!-- 页面标题和操作按钮 -->
-    <div class="page-header flex justify-between items-center mb-6">
-      <div class="header-title flex items-center">
-        <h1 class="text-xl font-semibold text-gray-800">用户信息管理</h1>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><User /></el-icon> 信息管理</h2>
+    <el-divider />
+    <div class="info-content">
+      <!-- 页面标题和操作按钮 -->
+      <div class="page-header flex justify-between items-center mb-6">
+        <div class="header-title flex items-center">
+          <h1 class="text-xl font-semibold text-gray-800">用户信息管理</h1>
+        </div>
+        <div class="header-actions">
+          <el-button type="primary" @click="openAddUserModal" class="mr-2">
+            <el-icon class="mr-1"><Plus /></el-icon> 新增用户
+          </el-button>
+        </div>
       </div>
-      <div class="header-actions">
-        <el-button type="primary" @click="openAddUserModal" class="mr-2">
-          <el-icon class="mr-1"><Plus /></el-icon> 新增用户
-        </el-button>
+
+      <!-- 搜索过滤区域 -->
+      <el-card class="filter-card mb-6">
+        <el-form :model="filterForm" :inline="true" label-width="80px">
+          <el-form-item label="用户名称">
+            <el-input v-model="filterForm.username" placeholder="请输入用户名称" clearable />
+          </el-form-item>
+          <el-form-item label="手机号码">
+            <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable />
+          </el-form-item>
+          <el-form-item label="公司名称">
+            <el-input v-model="filterForm.company" placeholder="请输入公司名称" clearable />
+          </el-form-item>
+          <el-form-item label="角色权限">
+            <el-select v-model="filterForm.is_super" placeholder="请选择角色">
+              <el-option label="超级管理员" :value="1" />
+              <el-option label="普通用户" :value="0" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="用户状态">
+            <el-select v-model="filterForm.status" placeholder="请选择状态">
+              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-select v-model="filterForm.gender" placeholder="请选择性别">
+              <el-option label="男" :value="1" />
+              <el-option label="女" :value="0" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleFilter">搜索</el-button>
+            <el-button @click="resetFilter">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+
+      <!-- 搜索条件显示区域 -->
+      <div v-if="getActiveFilters().length > 0" class="active-filters mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+        <div class="text-sm text-gray-600">
+          <span class="font-medium">当前搜索条件:</span>
+          <span v-for="(filter, index) in getActiveFilters()" :key="index" class="ml-2">
+            <el-tag type="info" size="small" @close="removeFilter(filter)">
+              {{ filter }}
+              <template #close>
+                <i class="el-icon-close"></i>
+              </template>
+            </el-tag>
+          </span>
+          <el-button size="small" type="text" @click="resetFilter" class="ml-2">
+            清除全部
+          </el-button>
+        </div>
       </div>
-    </div>
 
-    <!-- 搜索过滤区域 -->
-    <el-card class="filter-card mb-6">
-      <el-form :model="filterForm" :inline="true" label-width="80px">
-        <el-form-item label="用户名称">
-          <el-input v-model="filterForm.username" placeholder="请输入用户名称" clearable />
-        </el-form-item>
-        <el-form-item label="手机号码">
-          <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable />
-        </el-form-item>
-        <el-form-item label="公司名称">
-          <el-input v-model="filterForm.company" placeholder="请输入公司名称" clearable />
-        </el-form-item>
-        <el-form-item label="角色权限">
-          <el-select v-model="filterForm.is_super" placeholder="请选择角色">
-            <el-option label="超级管理员" :value="1" />
-            <el-option label="普通用户" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用户状态">
-          <el-select v-model="filterForm.status" placeholder="请选择状态">
-            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-select v-model="filterForm.gender" placeholder="请选择性别">
-            <el-option label="男" :value="1" />
-            <el-option label="女" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleFilter">搜索</el-button>
-          <el-button @click="resetFilter">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <!-- 搜索条件显示区域 -->
-    <div v-if="getActiveFilters().length > 0" class="active-filters mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-      <div class="text-sm text-gray-600">
-        <span class="font-medium">当前搜索条件:</span>
-        <span v-for="(filter, index) in getActiveFilters()" :key="index" class="ml-2">
-          <el-tag type="info" size="small" @close="removeFilter(filter)">
-            {{ filter }}
-            <template #close>
-              <i class="el-icon-close"></i>
+      <!-- 用户列表区域 -->
+      <el-card class="user-list-card">
+        <el-table
+          v-loading="loading"
+          :data="userList"
+          stripe
+          style="width: 100%"
+          row-key="id"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="50" />
+          <el-table-column prop="id" label="ID" width="80" />
+          <el-table-column prop="username" label="用户名称" min-width="120" />
+          <el-table-column prop="nickname" label="用户昵称" min-width="120" />
+          <el-table-column prop="phone" label="手机号码" min-width="150" />
+          <el-table-column prop="email" label="邮箱" min-width="180" />
+          <el-table-column prop="company" label="公司名称" min-width="150" />
+          <el-table-column prop="is_super" label="角色" min-width="100">
+            <template #default="{ row }">
+              <el-tag :type="row.is_super === 1 ? 'danger' : 'info'">
+                {{ row.is_super === 1 ? '超级管理员' : '普通用户' }}
+              </el-tag>
             </template>
-          </el-tag>
-        </span>
-        <el-button size="small" type="text" @click="resetFilter" class="ml-2">
-          清除全部
-        </el-button>
-      </div>
-    </div>
+          </el-table-column>
+          <el-table-column prop="status" label="状态" min-width="100">
+            <template #default="{ row }">
+              <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+                {{ row.status === 1 ? '正常' : '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="gender" label="性别" min-width="80">
+            <template #default="{ row }">
+              <el-tag :type="row.gender === 1 ? 'primary' : 'success'">
+                {{ row.gender === 1 ? '男' : '女' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="create_time" label="创建时间" min-width="180">
+            <template #default="{ row }">
+              {{ formatDateTime(row.create_time) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200">
+            <template #default="{ row }">
+              <el-button size="small" @click="openEditUserModal(row)">编辑</el-button>
+              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
-    <!-- 用户列表区域 -->
-    <el-card class="user-list-card">
-      <el-table
-        v-loading="loading"
-        :data="userList"
-        stripe
-        style="width: 100%"
-        row-key="id"
-        @selection-change="handleSelectionChange"
+        <!-- 分页组件 -->
+        <div class="pagination-container flex justify-center mt-4 w-full">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </el-card>
+
+      <!-- 新增/编辑用户弹窗 -->
+      <el-dialog
+        v-model="dialogVisible"
+        :title="isEditing ? '编辑用户' : '新增用户'"
+        width="500px"
+        :before-close="handleDialogClose"
       >
-        <el-table-column type="selection" width="50" />
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户名称" min-width="120" />
-        <el-table-column prop="nickname" label="用户昵称" min-width="120" />
-        <el-table-column prop="phone" label="手机号码" min-width="150" />
-        <el-table-column prop="email" label="邮箱" min-width="180" />
-        <el-table-column prop="company" label="公司名称" min-width="150" />
-        <el-table-column prop="is_super" label="角色" min-width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.is_super === 1 ? 'danger' : 'info'">
-              {{ row.is_super === 1 ? '超级管理员' : '普通用户' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" min-width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="gender" label="性别" min-width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.gender === 1 ? 'primary' : 'success'">
-              {{ row.gender === 1 ? '男' : '女' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" min-width="180">
-          <template #default="{ row }">
-            {{ formatDateTime(row.create_time) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200">
-          <template #default="{ row }">
-            <el-button size="small" @click="openEditUserModal(row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- 分页组件 -->
-      <div class="pagination-container flex justify-center mt-4 w-full">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-
-    <!-- 新增/编辑用户弹窗 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isEditing ? '编辑用户' : '新增用户'"
-      width="500px"
-      :before-close="handleDialogClose"
-    >
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
-        <el-form-item label="用户名称" prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名称" />
-        </el-form-item>
-        <el-form-item label="用户昵称" prop="nickname">
-          <el-input v-model="form.nickname" placeholder="请输入用户昵称" />
-        </el-form-item>
-        <el-form-item label="手机号码" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号码" />
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱" />
-        </el-form-item>
-        <el-form-item label="公司名称" prop="company">
-          <el-input v-model="form.company" placeholder="请输入公司名称" />
-        </el-form-item>
-        <el-form-item label="用户状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="角色权限" prop="is_super">
-          <el-select v-model="form.is_super" placeholder="请选择角色">
-            <el-option label="超级管理员" :value="1" />
-            <el-option label="普通用户" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-select v-model="form.gender" placeholder="请选择性别">
-            <el-option label="男" :value="1" />
-            <el-option label="女" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="!isEditing">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
-        </el-form-item>
-        <el-form-item label="确认密码" v-if="!isEditing">
-          <el-input v-model="form.confirmPassword" type="password" placeholder="请确认密码" show-password />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="handleDialogClose">取消</el-button>
-          <el-button type="primary" @click="submitForm">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+        <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+          <el-form-item label="用户名称" prop="username">
+            <el-input v-model="form.username" placeholder="请输入用户名称" />
+          </el-form-item>
+          <el-form-item label="用户昵称" prop="nickname">
+            <el-input v-model="form.nickname" placeholder="请输入用户昵称" />
+          </el-form-item>
+          <el-form-item label="手机号码" prop="phone">
+            <el-input v-model="form.phone" placeholder="请输入手机号码" />
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="form.email" placeholder="请输入邮箱" />
+          </el-form-item>
+          <el-form-item label="公司名称" prop="company">
+            <el-input v-model="form.company" placeholder="请输入公司名称" />
+          </el-form-item>
+          <el-form-item label="用户状态" prop="status">
+            <el-select v-model="form.status" placeholder="请选择状态">
+              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="角色权限" prop="is_super">
+            <el-select v-model="form.is_super" placeholder="请选择角色">
+              <el-option label="超级管理员" :value="1" />
+              <el-option label="普通用户" :value="0" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="性别" prop="gender">
+            <el-select v-model="form.gender" placeholder="请选择性别">
+              <el-option label="男" :value="1" />
+              <el-option label="女" :value="0" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="密码" prop="password" v-if="!isEditing">
+            <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+          </el-form-item>
+          <el-form-item label="确认密码" v-if="!isEditing">
+            <el-input v-model="form.confirmPassword" type="password" placeholder="请确认密码" show-password />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="handleDialogClose">取消</el-button>
+            <el-button type="primary" @click="submitForm">确定</el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { Plus, Delete } from '@element-plus/icons-vue';
+import { Plus, Delete, User } from '@element-plus/icons-vue';
 import { debounce } from 'lodash-es';
 import request from '@/utils/request';
 
@@ -527,9 +531,46 @@ function formatDateTime(val) {
 </script>
 
 <style scoped>
-/* 页面整体样式 */
-.info-management-page {
-  padding: 20px;
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-height: 600px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.info-content {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.8;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
 }
 
 /* 搜索条件显示的样式 */
@@ -553,5 +594,4 @@ function formatDateTime(val) {
   display: flex !important;
   justify-content: center !important;
 }
-
 </style>  
