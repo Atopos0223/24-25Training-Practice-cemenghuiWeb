@@ -7,16 +7,21 @@
 
     <el-card v-if="dynamicData" class="mt-4">
       <h2>{{ dynamicData.title }}</h2>
-      <div class="meta">
-        <span><el-icon><User /></el-icon> 作者: {{ dynamicData.author }}</span>
-        <span><el-icon><Clock /></el-icon> 时间: {{ dynamicData.createTime }}</span>
-        <el-tag :type="dynamicData.status === '已发布' ? 'success' : 'warning'">
-          {{ dynamicData.status }}
-        </el-tag>
+      <div style="margin-bottom: 16px;">
+        <span>
+          <el-icon><User /></el-icon>
+          作者ID：{{ dynamicData.author_id }}
+        </span>
+        <span style="margin-left: 24px;">
+          <el-icon><Clock /></el-icon>
+          发布时间：{{ formatDateTime(dynamicData.create_time) }}
+        </span>
       </div>
-      
+      <div v-if="dynamicData.image" style="margin-bottom: 16px;">
+        <!-- 正确写法：使用 v-bind 绑定 src，拼接完整 URL 并包裹动态数据 -->
+        <img :src="`http://localhost:8080${dynamicData.image}`" alt="新闻图片" style="max-width: 300px;" />
+      </div>
       <el-divider />
-      
       <div class="content" v-html="dynamicData.content"></div>
     </el-card>
 
@@ -29,6 +34,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, User, Clock } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
 interface Dynamic {
   id: number
@@ -37,6 +43,9 @@ interface Dynamic {
   content: string
   createTime: string
   status: string
+  author_id: number
+  create_time: string
+  image?: string
 }
 
 const route = useRoute()
@@ -46,40 +55,26 @@ const loading = ref(false)
 // 调试输出
 console.log('路由参数:', route.params)
 
-// 模拟数据 - 确保与列表数据一致
-const mockData = [
-  {
-    id: 1,
-    title: '行业最新动态：AI技术在教育领域的应用',
-    author: '张三',
-    content: `
-      <h3>人工智能教育应用详情</h3>
-      <p>本文详细介绍了AI技术如何改变传统教育模式：</p>
-      <ul>
-        <li>智能个性化学习系统</li>
-        <li>自动化作业批改</li>
-        <li>虚拟教学助手</li>
-      </ul>
-      <p>实际案例显示，采用AI技术的班级平均成绩提升25%</p>
-    `,
-    createTime: '2025-06-15 14:30:00',
-    status: '已发布'
+function formatDateTime(val: string) {
+  if (!val) return '';
+  return val.replace('T', ' ').replace(/\..*$/, '');
+}
+
+const fetchDetail = async () => {
+  try {
+    const res = await request.get(`/news/detail/${route.params.id}`)
+    if (res.data.code === 200) {
+      dynamicData.value = res.data.data
+    } else {
+      ElMessage.error(res.data.msg || '获取详情失败')
+    }
+  } catch (e) {
+    ElMessage.error('获取详情失败')
   }
-]
+}
 
 onMounted(() => {
-  const id = Number(route.params.id)
-  console.log('正在查找ID:', id)
-
-  const item = mockData.find(item => item.id == id)
-  console.log('找到的详情数据:', item)
-
-  if (item) {
-    dynamicData.value = item
-  } else {
-    ElMessage.error('未找到该动态详情')
-    router.push('/industry-dynamic/list')
-  }
+  fetchDetail()
 })
 </script>
 

@@ -60,9 +60,7 @@
 					<el-menu-item index="/userhome/coursemanage/list" class="menu-item">
 					  <span>课程列表</span>
 					</el-menu-item>
-					<el-menu-item index="/userhome/coursemanage/audit" class="menu-item">
-					  <span>审核状态</span>
-					</el-menu-item>
+
 				  </el-sub-menu>
 				  
 				  <!-- 会议管理下拉菜单 -->

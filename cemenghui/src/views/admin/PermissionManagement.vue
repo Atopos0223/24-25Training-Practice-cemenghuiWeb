@@ -2,10 +2,6 @@
   <div class="permission-management">
     <div class="page-header">
       <h2>权限管理</h2>
-      <el-button type="primary" @click="showAddUserDialog = true">
-        <el-icon><Plus /></el-icon>
-        添加用户
-      </el-button>
     </div>
 
     <!-- 用户权限列表 -->
@@ -31,30 +27,33 @@
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="用户名" width="120" />
         <el-table-column prop="email" label="邮箱" width="200" />
-        <el-table-column prop="role" label="角色" width="120">
+        <el-table-column prop="is_super" label="角色" width="120">
           <template #default="scope">
-            <el-tag :type="getRoleType(scope.row.role)">
-              {{ getRoleName(scope.row.role) }}
+            <el-tag :type="scope.row.is_super === 1 ? 'danger' : 'info'">
+              {{ getRoleName(scope.row.is_super) }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
-            <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
-              {{ scope.row.status === 'active' ? '启用' : '禁用' }}
+            <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
+              {{ scope.row.status === 1 ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="create_time" label="创建时间" min-width="180">
+          <template #default="{ row }">
+            {{ formatDateTime(row.create_time) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="scope">
-            <el-button size="small" @click="editUser(scope.row)">编辑</el-button>
             <el-button 
               size="small" 
               type="danger" 
               @click="toggleUserStatus(scope.row)"
             >
-              {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+              {{ scope.row.status === 1 ? '禁用' : '启用' }}
             </el-button>
           </template>
         </el-table-column>
@@ -114,6 +113,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
 // 响应式数据
 const loading = ref(false)
@@ -124,34 +124,7 @@ const total = ref(0)
 const showAddUserDialog = ref(false)
 const editingUser = ref(null)
 const userFormRef = ref()
-
-// 用户列表数据
-const users = ref([
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@example.com',
-    role: 'super_admin',
-    status: 'active',
-    createTime: '2025-01-01 10:00:00'
-  },
-  {
-    id: 2,
-    username: 'manager',
-    email: 'manager@example.com',
-    role: 'admin',
-    status: 'active',
-    createTime: '2025-01-02 11:00:00'
-  },
-  {
-    id: 3,
-    username: 'user1',
-    email: 'user1@example.com',
-    role: 'user',
-    status: 'active',
-    createTime: '2025-01-03 12:00:00'
-  }
-])
+const users = ref([])
 
 // 表单数据
 const userForm = reactive({
@@ -188,22 +161,8 @@ const filteredUsers = computed(() => {
 })
 
 // 方法
-const getRoleType = (role) => {
-  const roleTypes = {
-    'super_admin': 'danger',
-    'admin': 'warning',
-    'user': 'info'
-  }
-  return roleTypes[role] || 'info'
-}
-
-const getRoleName = (role) => {
-  const roleNames = {
-    'super_admin': '超级管理员',
-    'admin': '管理员',
-    'user': '普通用户'
-  }
-  return roleNames[role] || '未知'
+const getRoleName = (is_super) => {
+  return is_super === 1 ? '超级管理员' : '普通用户'
 }
 
 const handleSearch = () => {
@@ -228,21 +187,29 @@ const editUser = (user) => {
 const toggleUserStatus = async (user) => {
   try {
     await ElMessageBox.confirm(
-      `确定要${user.status === 'active' ? '禁用' : '启用'}用户 "${user.username}" 吗？`,
+      `确定要${user.status === 1 ? '禁用' : '启用'}用户 "${user.username}" 吗？`,
       '提示',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }
-    )
-    
-    user.status = user.status === 'active' ? 'inactive' : 'active'
-    ElMessage.success(`用户状态${user.status === 'active' ? '启用' : '禁用'}成功`)
+    );
+    // 调用后端接口更新用户状态，只传id和status
+    const res = await request.post('http://localhost:8080/updateUserStatus', {
+      id: Number(user.id),
+      status: user.status === 1 ? 0 : 1
+    });
+    if (res.data.code === 200) {
+      ElMessage.success(`用户状态${user.status === 1 ? '禁用' : '启用'}成功`);
+      fetchUserList(); // 刷新列表
+    } else {
+      ElMessage.error(res.data.msg || '操作失败');
+    }
   } catch (error) {
-    // 用户取消操作
+    // 用户取消操作或请求失败
   }
-}
+};
 
 const saveUser = async () => {
   try {
@@ -260,7 +227,7 @@ const saveUser = async () => {
       const newUser = {
         id: users.value.length + 1,
         ...userForm,
-        createTime: new Date().toLocaleString()
+        create_time: new Date().toISOString()
       }
       users.value.push(newUser)
       ElMessage.success('用户添加成功')
@@ -284,8 +251,33 @@ const resetForm = () => {
   userFormRef.value?.resetFields()
 }
 
+const fetchUserList = async () => {
+  loading.value = true
+  try {
+    const res = await request.get('/userList', {
+      headers: { 'Cache-Control': 'no-cache' }
+    })
+    if (res.data.code === 200) {
+      users.value = (res.data.data || []).slice().sort((a, b) => a.id - b.id)
+    } else {
+      users.value = []
+      ElMessage.error(res.data.msg || '获取用户列表失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取用户列表失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+function formatDateTime(val) {
+  if (!val) return '';
+  return val.replace('T', ' ').slice(0, 19);
+}
+
 // 生命周期
 onMounted(() => {
+  fetchUserList()
   total.value = users.value.length
 })
 </script>

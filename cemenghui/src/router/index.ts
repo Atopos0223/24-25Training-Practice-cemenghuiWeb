@@ -17,65 +17,65 @@ const routes: RouteRecordRaw[] = [
 	children: [
 		
 	  {
-	    path: '/info-management',
-	    name: 'InfoManagement',
-	    component: () => import('../views/InfoManagementView.vue'),
-	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
+	    path: 'info-management',
+	    name: 'AdminInfoManagement',
+	    component: () => import('@/views/InfoManagementView.vue'),
+	    
 	  },
 	  {
-        path: '/permission-management',
+        path: 'permission-management',
         name: 'PermissionManagement',
         component: () => import('@/views/admin/PermissionManagement.vue'),
         meta: { title: '权限管理' }
       },
 	  {
-        path: '/audit-news',
+        path: 'audit-news',
         name: 'AuditNews',
         component: () => import('@/views/admin/AuditNews.vue'),
         meta: { title: '审核资讯' }
       },
 	  {
-        path: '/audit-courses',
+        path: 'audit-courses',
         name: 'AuditCourses',
         component: () => import('@/views/admin/AuditCourses.vue'),
         meta: { title: '审核课程' }
       },
 	  {
-        path: '/audit-meetings',
+        path: 'audit-meetings',
         name: 'AuditMeetings',
         component: () => import('@/views/admin/AuditMeetings.vue'),
         meta: { title: '审核会议' }
       },
 	  {
-        path: '/create-meeting',
+        path: 'create-meeting',
         name: 'CreateMeeting',
         component: () => import('@/views/admin/CreateMeeting.vue'),
         meta: { title: '创建会议' }
       },
 	  {
-        path: '/personal-center',
+        path: 'personal-center',
         name: 'PersonalCenter',
         component: () => import('@/views/admin/PersonalCenter.vue'),
         meta: { title: '个人中心' }
       },
 	  {
-        path: '/manage-dynamics',
+        path: 'manage-dynamics',
         component: () => import('@/views/admin/DynamicList.vue'),
         meta: { title: '动态列表' }
       },
 	  {
-	    path: '/publish',
-	    name: 'InfoManagement',
+	    path: 'publish',
+	    name: 'AdminPublishDynamic',
 	    component: () => import('../views/user/PublishDynamic.vue'),
 	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
 	  },
 	  {
-	    path: '/manage-courses',
+	    path: 'manage-courses',
 	    component: () => import('@/views/admin/CourseList.vue'),
 	    meta: { title: '课程列表' }
 	  },
 	  {
-	    path: '/manage-meetings',
+	    path: 'manage-meetings',
 	    component: () => import('@/views/admin/MeetingList.vue'),
 	    meta: { title: '会议列表' }
 	  },
@@ -144,8 +144,16 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'detail/:id',
+            name: 'DynamicDetail',
             component: () => import('@/views/user/DynamicDetail.vue'),
             meta: { title: '动态详情' },
+            props: true
+          },
+          {
+            path: 'edit/:id',
+            name: 'EditDynamic',
+            component: () => import('@/views/user/EditDynamic.vue'),
+            meta: { title: '编辑动态' },
             props: true
           }
         ]

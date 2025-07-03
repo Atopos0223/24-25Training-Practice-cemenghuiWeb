@@ -29,10 +29,10 @@
               <el-icon><User /></el-icon>
               <span>用户管理</span>
             </template>
-            <el-menu-item index="/info-management" class="menu-item">
+            <el-menu-item index="/adminhome/info-management" class="menu-item">
               <span>信息管理</span>
             </el-menu-item>
-            <el-menu-item index="/permission-management" class="menu-item">
+            <el-menu-item index="/adminhome/permission-management" class="menu-item">
               <span>权限管理</span>
             </el-menu-item>
           </el-sub-menu>
@@ -43,10 +43,10 @@
               <el-icon><TrendCharts /></el-icon>
               <span>行业动态管理</span>
             </template>
-            <el-menu-item index="/audit-news" class="menu-item">
+            <el-menu-item index="/adminhome/audit-news" class="menu-item">
               <span>审核资讯</span>
             </el-menu-item>
-            <el-menu-item index="/manage-dynamics" class="menu-item">
+            <el-menu-item index="/adminhome/manage-dynamics" class="menu-item">
               <span>管理动态</span>
             </el-menu-item>
           </el-sub-menu>
@@ -57,10 +57,10 @@
               <el-icon><Notebook /></el-icon>
               <span>课程管理</span>
             </template>
-            <el-menu-item index="/audit-courses" class="menu-item">
+            <el-menu-item index="/adminhome/audit-courses" class="menu-item">
               <span>审核课程</span>
             </el-menu-item>
-            <el-menu-item index="/manage-courses" class="menu-item">
+            <el-menu-item index="/adminhome/manage-courses" class="menu-item">
               <span>管理课程</span>
             </el-menu-item>
           </el-sub-menu>
@@ -71,19 +71,19 @@
               <el-icon><Calendar /></el-icon>
               <span>会议管理</span>
             </template>
-            <el-menu-item index="/audit-meetings" class="menu-item">
+            <el-menu-item index="/adminhome/audit-meetings" class="menu-item">
               <span>审核会议</span>
             </el-menu-item>
-            <el-menu-item index="/manage-meetings" class="menu-item">
+            <el-menu-item index="/adminhome/manage-meetings" class="menu-item">
               <span>会议管理</span>
             </el-menu-item>
-            <el-menu-item index="/create-meeting" class="menu-item">
+            <el-menu-item index="/adminhome/create-meeting" class="menu-item">
               <span>创建会议</span>
             </el-menu-item>
           </el-sub-menu>
           
           <!-- 个人中心单级菜单 -->
-          <el-menu-item index="/personal-center" class="menu-item">
+          <el-menu-item index="/adminhome/personal-center" class="menu-item">
             <el-icon><Setting /></el-icon>
             <span>个人中心</span>
           </el-menu-item>
