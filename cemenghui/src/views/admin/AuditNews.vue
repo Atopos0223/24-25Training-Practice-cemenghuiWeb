@@ -1,31 +1,35 @@
 <template>
-  <div class="audit-news">
-    <div class="page-header">
-      <h2>审核资讯</h2>
-      <div class="filter-section">
-        <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
-          <el-option label="全部" value="" />
-          <el-option label="待审核" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="已拒绝" value="rejected" />
-        </el-select>
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索标题或作者"
-          style="width: 250px"
-          clearable
-        >
-          <template #prefix>
-            <el-icon><Search /></el-icon>
-          </template>
-        </el-input>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 审核资讯</h2>
+    <el-divider />
+    <div class="audit-news">
+      <div class="page-header">
+        <h2>审核资讯</h2>
+        <div class="filter-section">
+          <el-select v-model="statusFilter" placeholder="状态筛选" style="width: 120px; margin-right: 10px">
+            <el-option label="全部" value="" />
+            <el-option label="待审核" value="pending" />
+            <el-option label="已通过" value="approved" />
+            <el-option label="已拒绝" value="rejected" />
+          </el-select>
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索标题或作者"
+            style="width: 250px"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
       </div>
-    </div>
 
-    <el-card>
       <el-table :data="filteredNews" style="width: 100%" v-loading="loading">
-        <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="id" label="作者ID" min-width="120" />
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="标题" min-width="120" />
+        <el-table-column prop="author" label="作者" width="100" />
+        <el-table-column prop="category" label="分类" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="getStatusType(scope.row.status)">
@@ -34,31 +38,19 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="createTime" label="发布时间" width="180">
+        <el-table-column prop="createTime" label="发布时间" width="160">
           <template #default="scope">
             {{ formatDateTime(scope.row.createTime) }}
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="success" 
-              @click="approveNews(scope.row)"
-            >
-              通过
-            </el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="danger" 
-              @click="rejectNews(scope.row)"
-            >
-              拒绝
-            </el-button>
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(scope.row)">查看</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="success" @click="approveNews(scope.row)">通过</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="danger" @click="rejectNews(scope.row)">拒绝</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -74,7 +66,7 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 详情对话框 -->
     <el-dialog v-model="showDetailDialog" title="资讯详情" width="800px">
@@ -121,7 +113,7 @@
         </span>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 
 <script setup>
@@ -262,6 +254,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped {
+  background: #f6faff;
+}
+.el-table__body tr:hover > td {
+  background: #e6f7ff !important;
+}
 .audit-news {
   padding: 20px;
 }
@@ -320,5 +348,16 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style> 

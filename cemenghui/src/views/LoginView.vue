@@ -1,30 +1,24 @@
 <template>
-  <div class="login-container">
-    <div class="background"></div>
-    
-    <!-- 居中容器 -->
-    <div class="center-wrapper">
-      <el-card class="login-card" shadow="hover">
-        <div slot="header" class="login-header">
-          <h3>测盟汇管理系统</h3>
-        </div>
-        <el-form :model="loginForm" label-width="90px" class="login-form">
-          <el-form-item label="账号">
-            <el-input v-model="uname" size="large"></el-input>
-          </el-form-item>
-          <el-form-item label="密码">
-            <el-input type="password" v-model="upwd" size="large"></el-input>
-          </el-form-item>
-          <el-form-item class="form-actions">
-            <el-button type="primary" size="large" @click="handleLogin">登录</el-button>
-            <el-button type="text" size="large" @click="handleRegister">注册</el-button>
-          </el-form-item>
-        </el-form>
-        <div class="forgot-password-link">
-          <a @click="handleFindPassword" style="cursor:pointer; color:#409EFF;">忘记密码？</a>
-        </div>
-      </el-card>
-    </div>
+  <div class="login-bg">
+    <el-card class="login-card" shadow="hover">
+      <h2 class="main-title"><el-icon><User /></el-icon> 用户登录</h2>
+      <el-divider />
+      <el-form :model="loginForm" label-width="90px" class="login-form">
+        <el-form-item label="账号">
+          <el-input v-model="uname" size="large"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input type="password" v-model="upwd" size="large"></el-input>
+        </el-form-item>
+        <el-form-item class="form-actions">
+          <el-button type="primary" size="large" @click="handleLogin">登录</el-button>
+          <el-button type="text" size="large" @click="handleRegister">注册</el-button>
+        </el-form-item>
+      </el-form>
+      <div class="forgot-password-link">
+        <a @click="handleFindPassword" style="cursor:pointer; color:#409EFF;">忘记密码？</a>
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -123,86 +117,44 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* 样式部分保持不变 */
-.login-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('https://picsum.photos/id/1048/1920/1080') center/cover no-repeat;
-  filter: blur(3px);
-  z-index: 1;
-}
-
-.center-wrapper {
-  position: relative;
-  z-index: 2;
+.login-bg {
+  min-height: 100vh;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 20px;
+  background: linear-gradient(120deg, #409EFF 0%, #53c0ff 100%);
 }
-
 .login-card {
-  width: 100%;
-  max-width: 450px; /* 增大登录框宽度 */
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.12);
+  padding: 40px 32px;
+  background: #fff;
+  min-width: 380px;
 }
-
-.login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.login-header h3 {
-  font-size: 24px;
-  color: #303133;
-  font-weight: 600;
-}
-
-.login-form {
-  padding: 20px 30px;
-}
-
-.form-actions {
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
-
-/* 响应式处理 */
-@media (max-width: 576px) {
-  .login-card {
-    max-width: 90%;
-  }
-  
-  .login-form {
-    padding: 15px;
-  }
-  
-  .background {
-    filter: blur(2px);
-  }
+.el-form-item {
+  margin-bottom: 24px;
 }
-
+.el-input {
+  border-radius: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
 .forgot-password-link {
   text-align: right;
   margin-top: 8px;

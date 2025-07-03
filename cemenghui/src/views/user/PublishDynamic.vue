@@ -1,35 +1,39 @@
 <template>
-  <div class="publish-news">
-    <el-form :model="form" ref="formRef" label-width="80px">
-      <el-form-item label="标题" prop="title" required>
-        <el-input v-model="form.title" placeholder="请输入新闻标题" />
-      </el-form-item>
-      <el-form-item label="新闻图片">
-        <el-upload
-          action="http://localhost:8080/news/upload"  
-		  name="file"
-          :on-success="handleUploadSuccess"
-          :show-file-list="false"
-        >
-          <el-button>选择图片</el-button>
-        </el-upload>
-        <div v-if="form.image">
-          <img :src="form.image" alt="新闻图片" style="max-width: 200px; margin-top: 10px;" />
-        </div>
-        <div class="el-form-item__extra">只能上传jpg/png图片</div>
-      </el-form-item>
-      <el-form-item label="简介" prop="summary">
-        <el-input v-model="form.summary" placeholder="请输入新闻简介" />
-      </el-form-item>
-      <el-form-item label="内容" prop="content" required>
-        <el-input type="textarea" v-model="form.content" placeholder="请输入新闻内容" :rows="6" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
-        <el-button @click="resetForm">重置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 发布动态</h2>
+    <el-divider />
+    <div class="publish-dynamic">
+      <el-form :model="form" ref="formRef" label-width="120px">
+        <el-form-item label="标题" prop="title" required>
+          <el-input v-model="form.title" placeholder="请输入新闻标题" />
+        </el-form-item>
+        <el-form-item label="新闻图片">
+          <el-upload
+            action="http://localhost:8080/news/upload"  
+            name="file"
+            :on-success="handleUploadSuccess"
+            :show-file-list="false"
+          >
+            <el-button>选择图片</el-button>
+          </el-upload>
+          <div v-if="form.image">
+            <img :src="form.image" alt="新闻图片" style="max-width: 200px; margin-top: 10px;" />
+          </div>
+          <div class="el-form-item__extra">只能上传jpg/png图片</div>
+        </el-form-item>
+        <el-form-item label="简介" prop="summary">
+          <el-input v-model="form.summary" placeholder="请输入新闻简介" />
+        </el-form-item>
+        <el-form-item label="内容" prop="content" required>
+          <el-input type="textarea" v-model="form.content" placeholder="请输入新闻内容" :rows="6" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+          <el-button @click="resetForm">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -99,12 +103,37 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-.publish-news {
-  padding: 30px 40px;
-  background: #f7f9fb;
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-form-item {
+  margin-bottom: 24px;
+}
+.el-input {
   border-radius: 8px;
-  max-width: 900px;
-  margin: 30px auto;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
 }
 </style>
     

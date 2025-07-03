@@ -72,12 +72,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '创建会议' }
       },
 	  {
-        path: 'personal-center',
-        name: 'PersonalCenter',
-        component: () => import('@/views/admin/PersonalCenter.vue'),
-        meta: { title: '个人中心' }
-      },
-	  {
         path: 'manage-dynamics',
         component: () => import('@/views/admin/DynamicList.vue'),
         meta: { title: '动态列表' }
@@ -113,7 +107,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '编辑动态' },
         props: true
       },
-
+      {
         path: '/adminhome/meetingmanage/edit',
         name: 'AdminEditMeeting',
         component: () => import('@/views/admin/EditMeeting.vue')

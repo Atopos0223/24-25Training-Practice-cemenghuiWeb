@@ -1,32 +1,44 @@
 <template>
+<<<<<<< Updated upstream
   <div class="dynamic-detail">
     <el-button @click="goBack">
       <el-icon><ArrowLeft /></el-icon>
       返回列表
     </el-button>
+=======
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 动态详情</h2>
+    <el-divider />
+    <div class="dynamic-detail">
+      <el-button @click="router.push('/userhome/industrydynamic/list')">
+        <el-icon><ArrowLeft /></el-icon>
+        返回列表
+      </el-button>
+>>>>>>> Stashed changes
 
-    <el-card v-if="dynamicData" class="mt-4">
-      <h2>{{ dynamicData.title }}</h2>
-      <div style="margin-bottom: 16px;">
-        <span>
-          <el-icon><User /></el-icon>
-          作者ID：{{ dynamicData.author_id }}
-        </span>
-        <span style="margin-left: 24px;">
-          <el-icon><Clock /></el-icon>
-          发布时间：{{ formatDateTime(dynamicData.create_time) }}
-        </span>
-      </div>
-      <div v-if="dynamicData.image" style="margin-bottom: 16px;">
-        <!-- 正确写法：使用 v-bind 绑定 src，拼接完整 URL 并包裹动态数据 -->
-        <img :src="`http://localhost:8080${dynamicData.image}`" alt="新闻图片" style="max-width: 300px;" />
-      </div>
-      <el-divider />
-      <div class="content" v-html="dynamicData.content"></div>
-    </el-card>
+      <el-card v-if="dynamicData" class="mt-4">
+        <h2>{{ dynamicData.title }}</h2>
+        <div style="margin-bottom: 16px;">
+          <span>
+            <el-icon><User /></el-icon>
+            作者ID：{{ dynamicData.author_id }}
+          </span>
+          <span style="margin-left: 24px;">
+            <el-icon><Clock /></el-icon>
+            发布时间：{{ formatDateTime(dynamicData.create_time) }}
+          </span>
+        </div>
+        <div v-if="dynamicData.image" style="margin-bottom: 16px;">
+          <!-- 正确写法：使用 v-bind 绑定 src，拼接完整 URL 并包裹动态数据 -->
+          <img :src="`http://localhost:8080${dynamicData.image}`" alt="新闻图片" style="max-width: 300px;" />
+        </div>
+        <el-divider />
+        <div class="content" v-html="dynamicData.content"></div>
+      </el-card>
 
-    <el-empty v-else description="动态内容加载失败" />
-  </div>
+      <el-empty v-else description="动态内容加载失败" />
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +99,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.08);
+  padding: 32px 24px;
+  background: #fff;
+  min-width: 400px;
+  margin: 24px 0;
+}
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.el-button {
+  border-radius: 24px;
+  font-size: 16px;
+  padding: 8px 32px;
+  transition: background 0.2s;
+}
+.el-button:hover {
+  background: #53c0ff;
+  color: #fff;
+}
 .dynamic-detail {
   padding: 20px;
   max-width: 900px;

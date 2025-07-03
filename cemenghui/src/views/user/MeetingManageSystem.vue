@@ -1,107 +1,109 @@
 <template>
-  <div class="meeting-manage-system">
-    <h2>Web端会议管理子系统</h2>
-    <el-tabs v-model="activeTab">
-      <el-tab-pane label="创建会议" name="create">
-        <el-form :model="meetingForm" label-width="120px">
-          <el-form-item label="会议名称">
-            <el-input v-model="meetingForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="开始时间">
-            <el-date-picker
-              v-model="meetingForm.startTime"
-              type="datetime"
-              placeholder="选择开始时间"
-            ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="结束时间">
-            <el-date-picker
-              v-model="meetingForm.endTime"
-              type="datetime"
-              placeholder="选择结束时间"
-            ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="创建人">
-            <el-input v-model="meetingForm.creator"></el-input>
-          </el-form-item>
-          <el-form-item label="会议内容">
-            <el-input type="textarea" v-model="meetingForm.content"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="createMeeting">创建</el-button>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-      
-      <el-tab-pane label="会议列表" name="list">
-        <el-row class="filter-row">
-          <el-col :span="6">
-            <el-date-picker
-              v-model="dateRange"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            ></el-date-picker>
-          </el-col>
-          <el-col :span="6">
-            <el-input v-model="searchName" placeholder="会议名称"></el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-input v-model="searchCreator" placeholder="创建人"></el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-button type="primary" @click="filterMeetings">筛选</el-button>
-          </el-col>
-        </el-row>
+  <el-card class="main-card" shadow="hover">
+    <h2 class="main-title"><el-icon><Calendar /></el-icon> 会议管理系统</h2>
+    <el-divider />
+    <div class="meeting-manage-system">
+      <el-tabs v-model="activeTab">
+        <el-tab-pane label="创建会议" name="create">
+          <el-form :model="meetingForm" label-width="120px">
+            <el-form-item label="会议名称">
+              <el-input v-model="meetingForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="开始时间">
+              <el-date-picker
+                v-model="meetingForm.startTime"
+                type="datetime"
+                placeholder="选择开始时间"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="结束时间">
+              <el-date-picker
+                v-model="meetingForm.endTime"
+                type="datetime"
+                placeholder="选择结束时间"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="创建人">
+              <el-input v-model="meetingForm.creator"></el-input>
+            </el-form-item>
+            <el-form-item label="会议内容">
+              <el-input type="textarea" v-model="meetingForm.content"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="createMeeting">创建</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
         
-        <el-table :data="meetingList" border style="width: 100%">
-          <el-table-column prop="name" label="会议名称"></el-table-column>
-          <el-table-column prop="creator" label="创建人"></el-table-column>
-          <el-table-column prop="startTime" label="开始时间"></el-table-column>
-          <el-table-column prop="status" label="状态"></el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button type="text" @click="viewMeeting(scope.row)">查看</el-button>
-              <el-button type="text" @click="editMeeting(scope.row)" 
-                v-if="scope.row.status === '未审核'">编辑</el-button>
-              <el-button type="text" @click="deleteMeeting(scope.row)" 
-                v-if="scope.row.status === '未审核'">删除</el-button>
-              <el-button type="text" @click="submitAudit(scope.row)" 
-                v-if="scope.row.status === '未审核'">提交审核</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-      
-      <el-tab-pane label="会议详情" name="detail" v-if="activeMeeting">
-        <el-card>
-          <h3>{{ activeMeeting.name }}</h3>
-          <el-descriptions column="2" border>
-            <el-descriptions-item label="开始时间">{{ formatDate(activeMeeting.startTime) }}</el-descriptions-item>
-            <el-descriptions-item label="结束时间">{{ formatDate(activeMeeting.endTime) }}</el-descriptions-item>
-            <el-descriptions-item label="创建人">{{ activeMeeting.creator }}</el-descriptions-item>
-            <el-descriptions-item label="状态">{{ activeMeeting.status }}</el-descriptions-item>
-            <el-descriptions-item label="会议内容" :span="2">{{ activeMeeting.content }}</el-descriptions-item>
-          </el-descriptions>
-        </el-card>
-      </el-tab-pane>
-      
-      <el-tab-pane label="审核管理" name="audit">
-        <el-table :data="auditList" border style="width: 100%">
-          <el-table-column prop="name" label="会议名称"></el-table-column>
-          <el-table-column prop="creator" label="创建人"></el-table-column>
-          <el-table-column prop="submitTime" label="提交时间"></el-table-column>
-          <el-table-column prop="status" label="审核状态"></el-table-column>
-          <el-table-column label="操作">
-            <template #default="scope">
-              <el-button type="text" @click="viewMeeting(scope.row)">查看</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-tab-pane>
-    </el-tabs>
-  </div>
+        <el-tab-pane label="会议列表" name="list">
+          <el-row class="filter-row">
+            <el-col :span="6">
+              <el-date-picker
+                v-model="dateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+              ></el-date-picker>
+            </el-col>
+            <el-col :span="6">
+              <el-input v-model="searchName" placeholder="会议名称"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-input v-model="searchCreator" placeholder="创建人"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button type="primary" @click="filterMeetings">筛选</el-button>
+            </el-col>
+          </el-row>
+          <el-table :data="meetingList" border style="width: 100%">
+            <el-table-column prop="id" label="序号" width="80" />
+            <el-table-column prop="name" label="会议名称" min-width="120" />
+            <el-table-column prop="creator" label="创建人" width="100" />
+            <el-table-column prop="startTime" label="开始时间" width="160" />
+            <el-table-column prop="status" label="状态" width="100" />
+            <el-table-column label="操作" width="360">
+              <template #default="scope">
+                <div class="button-row">
+                  <el-button type="primary" size="small" @click="viewMeeting(scope.row)">查看</el-button>
+                  <el-button type="warning" size="small" @click="editMeeting(scope.row)" v-if="scope.row.status === '未审核'">编辑</el-button>
+                  <el-button type="danger" size="small" @click="deleteMeeting(scope.row)" v-if="scope.row.status === '未审核'">删除</el-button>
+                  <el-button type="success" size="small" @click="submitAudit(scope.row)" v-if="scope.row.status === '未审核'">提交审核</el-button>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        
+        <el-tab-pane label="会议详情" name="detail" v-if="activeMeeting">
+          <el-card>
+            <h3>{{ activeMeeting.name }}</h3>
+            <el-descriptions column="2" border>
+              <el-descriptions-item label="开始时间">{{ formatDate(activeMeeting.startTime) }}</el-descriptions-item>
+              <el-descriptions-item label="结束时间">{{ formatDate(activeMeeting.endTime) }}</el-descriptions-item>
+              <el-descriptions-item label="创建人">{{ activeMeeting.creator }}</el-descriptions-item>
+              <el-descriptions-item label="状态">{{ activeMeeting.status }}</el-descriptions-item>
+              <el-descriptions-item label="会议内容" :span="2">{{ activeMeeting.content }}</el-descriptions-item>
+            </el-descriptions>
+          </el-card>
+        </el-tab-pane>
+        
+        <el-tab-pane label="审核管理" name="audit">
+          <el-table :data="auditList" border style="width: 100%">
+            <el-table-column prop="name" label="会议名称"></el-table-column>
+            <el-table-column prop="creator" label="创建人"></el-table-column>
+            <el-table-column prop="submitTime" label="提交时间"></el-table-column>
+            <el-table-column prop="status" label="审核状态"></el-table-column>
+            <el-table-column label="操作">
+              <template #default="scope">
+                <el-button type="text" @click="viewMeeting(scope.row)">查看</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+  </el-card>
 </template>
 
 <script setup lang="ts">
@@ -257,5 +259,14 @@ const filterMeetings = () => {
 .filter-row {
   margin-bottom: 15px;
   gap: 10px;
+}
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>

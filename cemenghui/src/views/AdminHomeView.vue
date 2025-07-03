@@ -83,12 +83,6 @@
               <span>创建会议</span>
             </el-menu-item>
           </el-sub-menu>
-          
-          <!-- 个人中心单级菜单 -->
-          <el-menu-item index="/adminhome/personal-center" class="menu-item">
-            <el-icon><Setting /></el-icon>
-            <span>个人中心</span>
-          </el-menu-item>
         </el-menu>
       </aside>
 
@@ -145,7 +139,7 @@ const logout = () => {
 
 .main-header {
   height: 60px;
-  background: #409EFF;
+  background: linear-gradient(90deg, #409EFF 0%, #53c0ff 100%);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -193,6 +187,9 @@ const logout = () => {
   padding-left: 20px;
   font-size: 14px;
   transition: all 0.3s;
+  border-radius: 8px;
+  margin: 6px 0;
+  transition: background 0.2s, color 0.2s;
 }
 
 .el-menu-item:hover, .el-sub-menu.is-active .el-sub-menu__title {

@@ -171,6 +171,15 @@ const logout = () => {
   background: #f5f7fa;
 }
 
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* 过渡动画 */
 .fade-enter-active,
 .fade-leave-active {
