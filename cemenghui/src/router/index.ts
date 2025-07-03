@@ -34,12 +34,28 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/admin/AuditNews.vue'),
         meta: { title: '审核资讯' }
       },
+	  
 	  {
         path: '/audit-courses',
         name: 'AuditCourses',
         component: () => import('@/views/admin/AuditCourses.vue'),
         meta: { title: '审核课程' }
       },
+	  {
+	  path: '/courses-management',
+	    name: 'CoursesManagement',
+	    component: () => import('@/views/admin/CoursesManagement.vue'),
+	    meta: { title: '管理课程' }
+	  },
+	{
+	path: 'courses-management/edit/:id',
+	  name: 'EditCourse',
+	  component: () => import('@/views/admin/EditCourse.vue'),
+	  meta: { title: '编辑课程' },
+	  props: true  // 允许将路由参数传递给组件
+	},
+	
+	
 	  {
         path: '/audit-meetings',
         name: 'AuditMeetings',

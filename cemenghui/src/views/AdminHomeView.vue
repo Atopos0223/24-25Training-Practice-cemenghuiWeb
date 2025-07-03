@@ -60,7 +60,7 @@
             <el-menu-item index="/audit-courses" class="menu-item">
               <span>审核课程</span>
             </el-menu-item>
-            <el-menu-item index="/manage-courses" class="menu-item">
+            <el-menu-item index="/courses-management" class="menu-item">
               <span>管理课程</span>
             </el-menu-item>
           </el-sub-menu>

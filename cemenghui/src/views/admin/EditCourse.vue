@@ -69,112 +69,125 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 
-interface FormData {
-  id: number
-  title: string
-  author: string
-  status: string
-  coverUrl?: string
-  intro?: string
-  videoUrl?: string
-}
-
 const route = useRoute()
 const router = useRouter()
 const loading = ref(false)
-const form = ref<FormData>({
+const form = ref({
   id: 0,
   title: '',
   author: '',
-  status: '已发布'
+  status: '已发布',
+  coverUrl: '',
+  intro: '',
+  videoUrl: ''
 })
-const coverFile = ref<File | null>(null)
-const videoFile = ref<File | null>(null)
+const coverFile = ref(null)
+const videoFile = ref(null)
 const coverPreview = ref(false)
 
-const getFinalUrl = (url?: string): string | undefined => {
-  if (!url) return undefined
+const getFinalUrl = (url) => {
+  if (!url) return ''
   if (url.startsWith('http') || url.startsWith('data:')) return url
   const baseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
   return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
 const handleBack = () => {
-  router.push('/userhome/coursemanage/list')
+  router.push('/adminhome/courses-management')
 }
 
-const handleCoverChange = (file: any) => {
-  coverFile.value = (file as any).raw
+const handleCoverChange = (file) => {
+  coverFile.value = file.raw
   coverPreview.value = true
 }
 
-const handleVideoChange = (file: any) => {
+const handleVideoChange = (file) => {
   videoFile.value = file.raw
 }
 
+// 修改loadCourse方法
 const loadCourse = async () => {
   try {
-    loading.value = true
-    const id = route.params.id
-    const res = await axios.get(`/api/course/${id}`)
+    loading.value = true;
+    const id = route.params.id;
+    console.log('正在加载课程ID:', id);
+    
+    const res = await axios.get(`/api/course/${id}`);
+    console.log('API响应:', res.data);
     
     if (res.data.success) {
       form.value = {
         ...res.data.data,
-        id: Number(id)
-      }
+        id: Number(id),
+        // 直接使用后端返回的URL，不再额外处理
+        coverUrl: res.data.data.coverUrl || '',
+        videoUrl: res.data.data.videoUrl || ''
+      };
+      console.log('表单数据已设置:', form.value);
+    } else {
+      throw new Error(res.data.message || '加载课程失败');
     }
   } catch (error) {
-    ElMessage.error('加载课程失败')
+    console.error('加载课程错误:', error);
+    ElMessage.error(`加载失败: ${error.message}`);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
+};
+
+const processUrl = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `${import.meta.env.VITE_API_BASE_URL || window.location.origin}${url}`
 }
 
+// 修改submitForm方法
 const submitForm = async () => {
   try {
-    loading.value = true
-    const formData = new FormData()
+    loading.value = true;
+    const formData = new FormData();
     
-    // 添加基本字段
-    formData.append('title', form.value.title)
-    formData.append('author', form.value.author)
-    if (form.value.intro) formData.append('intro', form.value.intro)
-    if (form.value.status) formData.append('status', form.value.status)
+    formData.append('title', form.value.title);
+    formData.append('author', form.value.author);
+    formData.append('status', form.value.status);
+    if (form.value.intro) formData.append('intro', form.value.intro);
     
-    // 添加文件
-    if (coverFile.value) formData.append('cover', coverFile.value)
-    if (videoFile.value) formData.append('video', videoFile.value)
+    if (coverFile.value) formData.append('cover', coverFile.value);
+    if (videoFile.value) formData.append('video', videoFile.value);
 
-    const res = await axios.post(`/api/course/edit/${form.value.id}`, formData, {
+    // 修改为PUT请求
+    const res = await axios.put(`/api/course/${form.value.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    })
+    });
 
     if (res.data.success) {
-      ElMessage.success('修改成功')
-      router.push('/userhome/coursemanage/list')
+      ElMessage.success('修改成功');
+      router.push('/adminhome/courses-management');
     } else {
-      throw new Error(res.data.message || '修改失败')
+      throw new Error(res.data.message || '修改失败');
     }
   } catch (error) {
-    ElMessage.error(error instanceof Error ? error.message : '修改失败')
+    console.error('提交失败:', error);
+    ElMessage.error(error.message || '修改失败');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
+// 确保onMounted调用loadCourse
 onMounted(() => {
-  loadCourse()
-})
+  console.log('当前课程ID:', route.params.id);
+  loadCourse().catch(e => console.error('加载失败:', e));
+});
 </script>
 
 <style scoped>
