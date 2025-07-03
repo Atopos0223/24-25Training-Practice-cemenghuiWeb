@@ -45,15 +45,12 @@
               {{ formatDateTime(row.create_time) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200">
+          <el-table-column label="操作" width="220">
             <template #default="scope">
-              <el-button 
-                size="small" 
-                type="danger" 
-                @click="toggleUserStatus(scope.row)"
-              >
-                {{ scope.row.status === 1 ? '禁用' : '启用' }}
-              </el-button>
+              <div class="button-row">
+                <el-button v-if="scope.row.status === 1" type="danger" size="small" @click="toggleUserStatus(scope.row)">禁用</el-button>
+                <el-button v-else type="success" size="small" @click="toggleUserStatus(scope.row)">启用</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>

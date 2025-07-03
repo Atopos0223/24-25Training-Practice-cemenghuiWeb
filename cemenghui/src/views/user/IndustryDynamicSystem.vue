@@ -43,17 +43,18 @@
             style="width: 300px; margin-bottom: 15px;"
           />
           <el-table :data="dynamicList" border style="width: 100%">
-            <el-table-column prop="title" label="标题"></el-table-column>
-            <el-table-column prop="author" label="作者"></el-table-column>
-            <el-table-column prop="createTime" label="发布时间"></el-table-column>
-            <el-table-column prop="status" label="审核状态"></el-table-column>
-            <el-table-column label="操作">
+            <el-table-column prop="id" label="序号" width="80" />
+            <el-table-column prop="title" label="标题" min-width="120" />
+            <el-table-column prop="author" label="作者" width="100" />
+            <el-table-column prop="createTime" label="发布时间" width="160" />
+            <el-table-column prop="status" label="审核状态" width="100" />
+            <el-table-column label="操作" width="360">
               <template #default="scope">
-                <el-button type="text" @click="viewDetail(scope.row)">查看</el-button>
-                <el-button type="text" @click="editDynamic(scope.row)" 
-                  v-if="scope.row.status !== '已发布'">编辑</el-button>
-                <el-button type="text" @click="deleteDynamic(scope.row)" 
-                  v-if="scope.row.status !== '已发布'">删除</el-button>
+                <div class="button-row">
+                  <el-button type="primary" size="small" @click="viewDetail(scope.row)">查看</el-button>
+                  <el-button type="warning" size="small" @click="editDynamic(scope.row)" v-if="scope.row.status !== '已发布'">编辑</el-button>
+                  <el-button type="danger" size="small" @click="deleteDynamic(scope.row)" v-if="scope.row.status !== '已发布'">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -258,5 +259,15 @@ const handleCurrentChange = (newPage: number) => {
 .content {
   margin-top: 20px;
   line-height: 1.8;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>

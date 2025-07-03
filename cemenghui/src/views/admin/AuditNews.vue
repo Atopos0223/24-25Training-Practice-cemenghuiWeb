@@ -26,8 +26,10 @@
       </div>
 
       <el-table :data="filteredNews" style="width: 100%" v-loading="loading">
-        <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="id" label="作者ID" min-width="120" />
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="标题" min-width="120" />
+        <el-table-column prop="author" label="作者" width="100" />
+        <el-table-column prop="category" label="分类" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="getStatusType(scope.row.status)">
@@ -36,31 +38,19 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="createTime" label="发布时间" width="180">
+        <el-table-column prop="createTime" label="发布时间" width="160">
           <template #default="scope">
             {{ formatDateTime(scope.row.createTime) }}
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="success" 
-              @click="approveNews(scope.row)"
-            >
-              通过
-            </el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="danger" 
-              @click="rejectNews(scope.row)"
-            >
-              拒绝
-            </el-button>
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(scope.row)">查看</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="success" @click="approveNews(scope.row)">通过</el-button>
+              <el-button v-if="scope.row.status === 'pending'" size="small" type="danger" @click="rejectNews(scope.row)">拒绝</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -358,5 +348,16 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style> 

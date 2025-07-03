@@ -1,47 +1,5 @@
 <template>
-<<<<<<< Updated upstream
-  <div class="dynamic-list">
-    <el-input
-      v-model="searchKeyword"
-      placeholder="请输入关键字搜索"
-      class="mb-4"
-      style="width: 300px"
-      @input="fetchList"
-      clearable
-    />
-    <el-table :data="newsList" style="width: 100%" border>
-      <el-table-column prop="title" label="标题" />
-      <el-table-column prop="author_id" label="作者ID" />
-      <el-table-column prop="create_time" label="发布时间">
-        <template #default="{ row }">
-          {{ formatDateTime(row.create_time) }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态">
-        <template #default="{ row }">
-          <span>{{ row.status === 1 ? '已发布' : row.status === 0 ? '审核中' : '未知' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="180">
-        <template #default="{ row }">
-          <el-button type="text" @click="handleView(row)">查看</el-button>
-          <el-button v-if="row.author_id === userId" type="text" @click="handleEdit(row)">编辑</el-button>
-          <el-button v-if="row.author_id === userId" type="text" @click="handleDelete(row)" style="color: red;">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :total="total"
-      :page-sizes="[10, 20, 50]"
-      layout="total, sizes, prev, pager, next, jumper"
-      class="mt-4"
-      @size-change="fetchList"
-      @current-change="fetchList"
-    />
-  </div>
-=======
+
   <el-card class="main-card" shadow="hover">
     <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 动态列表</h2>
     <el-divider />
@@ -55,23 +13,26 @@
         clearable
       />
       <el-table :data="newsList" style="width: 100%" border>
-        <el-table-column prop="title" label="标题" />
-        <el-table-column prop="author_id" label="作者ID" />
-        <el-table-column prop="create_time" label="发布时间">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="标题" min-width="120" />
+        <el-table-column prop="author_id" label="作者ID" width="100" />
+        <el-table-column prop="create_time" label="发布时间" width="160">
           <template #default="{ row }">
             {{ formatDateTime(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <span>{{ row.status === 1 ? '已发布' : row.status === 0 ? '审核中' : '未知' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180">
-          <template #default="{ row }">
-            <el-button type="text" @click="handleView(row)">查看</el-button>
-            <el-button type="text" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="text" @click="handleDelete(row)" style="color: red;">删除</el-button>
+        <el-table-column label="操作" width="360">
+          <template #default="{row}">
+            <div class="button-row">
+              <el-button type="primary" size="small" @click="viewDetail(row)">查看</el-button>
+              <el-button type="warning" size="small" @click="editDynamic(row)" v-if="row.canEdit">编辑</el-button>
+              <el-button type="danger" size="small" @click="deleteDynamic(row)" v-if="row.canEdit">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -87,7 +48,7 @@
       />
     </div>
   </el-card>
->>>>>>> Stashed changes
+
 </template>
 
 <script setup lang="ts">
@@ -201,5 +162,14 @@ onMounted(() => {
 }
 .el-table__body tr:hover > td {
   background: #e6f7ff !important;
+}
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>

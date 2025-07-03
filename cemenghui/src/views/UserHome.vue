@@ -86,8 +86,6 @@
 
       <!-- 右侧Main -->
       <main class="main-content">
-        <h2 class="main-title"><el-icon><User /></el-icon> 用户首页</h2>
-        <el-divider />
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />

@@ -9,9 +9,10 @@
       </div>
 
       <el-table :data="filteredCourses" border v-loading="loading">
-        <el-table-column prop="title" label="课程名称" />
-        <el-table-column prop="author" label="作者" />
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="title" label="课程名称" min-width="120" />
+        <el-table-column prop="author" label="作者" width="100" />
+        <el-table-column prop="status" label="状态" width="100">
           <template #default="{row}">
             <el-tag :type="getStatusTagType(row.status)">{{ row.status }}</el-tag>
           </template>
@@ -55,11 +56,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220">
+        <el-table-column label="操作" width="360">
           <template #default="{row}">
-            <el-button type="primary" size="small" @click="viewDetail(row.id)">查看</el-button>
-            <el-button type="warning" size="small" @click="editCourse(row)">编辑</el-button>
-            <el-button type="danger" size="small" @click="deleteCourse(row.id)">删除</el-button>
+            <div class="button-row">
+              <el-button type="primary" size="small" @click="viewDetail(row)">查看</el-button>
+              <el-button type="warning" size="small" @click="editCourse(row)" v-if="row.canEdit">编辑</el-button>
+              <el-button type="danger" size="small" @click="deleteCourse(row)" v-if="row.canEdit">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

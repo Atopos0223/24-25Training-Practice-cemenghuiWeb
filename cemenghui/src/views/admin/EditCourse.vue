@@ -228,7 +228,7 @@ onMounted(() => {
 .el-button {
   border-radius: 24px;
   font-size: 16px;
-  padding: 8px 32px;
+  padding: 8px 24px;
   transition: background 0.2s;
 }
 .el-button:hover {
@@ -241,5 +241,11 @@ onMounted(() => {
 .preview-tip {
   margin-left: 10px;
   color: #67c23a;
+}
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
 }
 </style>

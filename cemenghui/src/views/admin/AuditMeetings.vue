@@ -27,25 +27,19 @@
       </div>
 
       <el-table :data="pagedMeetings" style="width: 100%" v-loading="loading">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="会议名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="creator_name" label="组织者" width="120" />
-        <el-table-column label="会议时间" width="180">
-          <template #default="{row}">
-            {{ row.startTime || row.start_time }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="location" label="地点" width="150" />
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="name" label="会议名称" min-width="120" />
+        <el-table-column prop="creator_name" label="组织者" width="100" />
+        <el-table-column prop="startTime" label="会议时间" width="160" />
+        <el-table-column prop="location" label="地点" width="120" />
+        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
-            <el-tag>{{ statusText(row.status) }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
-            <el-button size="small" type="success" @click="auditMeeting(row.id, 2)" v-if="row.status == 1">通过</el-button>
-            <el-button size="small" type="danger" @click="auditMeeting(row.id, 3)" v-if="row.status == 1">驳回</el-button>
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(row.id)">查看</el-button>
+              <el-button size="small" type="success" @click="auditMeeting(row.id, 2)" v-if="row.status == 1">通过</el-button>
+              <el-button size="small" type="danger" @click="auditMeeting(row.id, 3)" v-if="row.status == 1">驳回</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -407,5 +401,16 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style> 

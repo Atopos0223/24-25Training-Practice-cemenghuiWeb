@@ -90,4 +90,14 @@ onMounted(async () => {
   margin: 0 auto;
   padding: 20px;
 }
+/* 若有操作按钮，横向排列 */
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
+}
 </style> 

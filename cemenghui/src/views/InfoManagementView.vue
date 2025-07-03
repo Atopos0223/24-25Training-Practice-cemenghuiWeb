@@ -5,9 +5,7 @@
     <div class="info-content">
       <!-- 页面标题和操作按钮 -->
       <div class="page-header flex justify-between items-center mb-6">
-        <div class="header-title flex items-center">
-          <h1 class="text-xl font-semibold text-gray-800">用户信息管理</h1>
-        </div>
+        
         <div class="header-actions">
           <el-button type="primary" @click="openAddUserModal" class="mr-2">
             <el-icon class="mr-1"><Plus /></el-icon> 新增用户
@@ -16,40 +14,42 @@
       </div>
 
       <!-- 搜索过滤区域 -->
-      <el-card class="filter-card mb-6">
-        <el-form :model="filterForm" :inline="true" label-width="80px">
-          <el-form-item label="用户名称">
-            <el-input v-model="filterForm.username" placeholder="请输入用户名称" clearable />
-          </el-form-item>
-          <el-form-item label="手机号码">
-            <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable />
-          </el-form-item>
-          <el-form-item label="公司名称">
-            <el-input v-model="filterForm.company" placeholder="请输入公司名称" clearable />
-          </el-form-item>
-          <el-form-item label="角色权限">
-            <el-select v-model="filterForm.is_super" placeholder="请选择角色">
-              <el-option label="超级管理员" :value="1" />
-              <el-option label="普通用户" :value="0" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="用户状态">
-            <el-select v-model="filterForm.status" placeholder="请选择状态">
-              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-select v-model="filterForm.gender" placeholder="请选择性别">
-              <el-option label="男" :value="1" />
-              <el-option label="女" :value="0" />
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleFilter">搜索</el-button>
-            <el-button @click="resetFilter">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </el-card>
+      <div class="search-bar">
+        <el-card class="filter-card mb-6">
+          <el-form :model="filterForm" :inline="true" label-width="80px">
+            <el-form-item label="用户名称">
+              <el-input v-model="filterForm.username" placeholder="请输入用户名称" clearable />
+            </el-form-item>
+            <el-form-item label="手机号码">
+              <el-input v-model="filterForm.phone" placeholder="请输入手机号码" clearable />
+            </el-form-item>
+            <el-form-item label="公司名称">
+              <el-input v-model="filterForm.company" placeholder="请输入公司名称" clearable />
+            </el-form-item>
+            <el-form-item label="角色权限">
+              <el-select v-model="filterForm.is_super" placeholder="请选择角色">
+                <el-option label="超级管理员" :value="1" />
+                <el-option label="普通用户" :value="0" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="用户状态">
+              <el-select v-model="filterForm.status" placeholder="请选择状态">
+                <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="性别">
+              <el-select v-model="filterForm.gender" placeholder="请选择性别">
+                <el-option label="男" :value="1" />
+                <el-option label="女" :value="0" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleFilter">搜索</el-button>
+              <el-button @click="resetFilter">重置</el-button>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </div>
 
       <!-- 搜索条件显示区域 -->
       <div v-if="getActiveFilters().length > 0" class="active-filters mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -79,7 +79,6 @@
           row-key="id"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" width="50" />
           <el-table-column prop="id" label="ID" width="80" />
           <el-table-column prop="username" label="用户名称" min-width="120" />
           <el-table-column prop="nickname" label="用户昵称" min-width="120" />
@@ -107,15 +106,12 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="create_time" label="创建时间" min-width="180">
-            <template #default="{ row }">
-              {{ formatDateTime(row.create_time) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="200">
-            <template #default="{ row }">
-              <el-button size="small" @click="openEditUserModal(row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+          <el-table-column label="操作" width="220">
+            <template #default="scope">
+              <div class="button-row">
+                <el-button type="primary" size="small" @click="openEditUserModal(scope.row)">编辑</el-button>
+                <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -593,5 +589,16 @@ function formatDateTime(val) {
 .pagination-container /deep/ .el-pagination {
   display: flex !important;
   justify-content: center !important;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
 }
 </style>  

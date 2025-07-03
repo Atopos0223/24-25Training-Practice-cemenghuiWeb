@@ -107,7 +107,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '编辑动态' },
         props: true
       },
-
+      {
         path: '/adminhome/meetingmanage/edit',
         name: 'AdminEditMeeting',
         component: () => import('@/views/admin/EditMeeting.vue')

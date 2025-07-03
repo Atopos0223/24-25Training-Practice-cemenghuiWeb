@@ -27,8 +27,8 @@
             width="80"
             :index="(index) => index + 1"
           />
-          <el-table-column prop="title" label="课程名称" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="author" label="作者" width="120" />
+          <el-table-column prop="title" label="课程名称" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="author" label="作者" width="100" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="scope">
               <el-tag 
@@ -38,7 +38,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="提交时间" width="180">
+          <el-table-column prop="createTime" label="提交时间" width="160">
             <template #default="scope">
               {{ formatDate(scope.row.createTime) }}
             </template>
@@ -75,23 +75,13 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column label="操作" width="360">
             <template #default="scope">
-              <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-              <el-button 
-                size="small" 
-                type="primary" 
-                @click="editCourse(scope.row)"
-              >
-                编辑
-              </el-button>
-              <el-button 
-                size="small" 
-                type="danger" 
-                @click="deleteCourse(scope.row)"
-              >
-                删除
-              </el-button>
+              <div class="button-row">
+                <el-button type="primary" size="small" @click="viewCourse(scope.row)">查看</el-button>
+                <el-button type="warning" size="small" @click="editCourse(scope.row)">编辑</el-button>
+                <el-button type="danger" size="small" @click="deleteCourse(scope.row)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -275,7 +265,7 @@ const handleCurrentChange = (val) => {
   currentPage.value = val
 }
 
-const viewDetail = (course) => {
+const viewCourse = (course) => {
   selectedCourse.value = course
   showDetailDialog.value = true
 }
@@ -479,5 +469,20 @@ onMounted(() => {
 }
 .el-table__body tr:hover > td {
   background: #e6f7ff !important;
+}
+.button-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.el-button {
+  font-size: 14px;
+  padding: 6px 16px;
+  min-width: 60px;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>

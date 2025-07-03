@@ -25,35 +25,18 @@
       </div>
       
       <el-table :data="filteredMeetings" border style="width: 100%">
-        <el-table-column prop="name" label="会议名称" width="180"/>
-        <el-table-column prop="startTime" label="开始时间" width="180">
+        <el-table-column prop="id" label="序号" width="80" />
+        <el-table-column prop="name" label="会议名称" min-width="120" />
+        <el-table-column prop="startTime" label="开始时间" width="160" />
+        <el-table-column prop="location" label="会议地点" width="120" />
+        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column label="操作" width="360">
           <template #default="{row}">
-            {{ formatDateTime(row.startTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="location" label="会议地点"/>
-        <el-table-column prop="status" label="状态">
-          <template #default="{row}">
-            <el-tag :type="statusTagType(row.status)">
-              {{ statusText(row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="220">
-          <template #default="{row}">
-            <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
-            <el-button 
-              size="small" 
-              type="warning" 
-              @click="editMeeting(row)"
-              v-if="row.creatorId === currentUserId"
-            >编辑</el-button>
-            <el-button 
-              size="small" 
-              type="danger" 
-              @click="confirmDeleteMeeting(row.id)"
-              v-if="row.creatorId === currentUserId"
-            >删除</el-button>
+            <div class="button-row">
+              <el-button size="small" type="primary" @click="viewDetail(row.id)">查看</el-button>
+              <el-button size="small" type="warning" @click="editMeeting(row)" v-if="row.creatorId === currentUserId">编辑</el-button>
+              <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)" v-if="row.creatorId === currentUserId">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -247,5 +230,15 @@ onMounted(() => {
 .el-pagination {
   margin-top: 20px;
   justify-content: flex-end;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+.el-table .el-table__cell {
+  padding: 12px 16px;
 }
 </style>
