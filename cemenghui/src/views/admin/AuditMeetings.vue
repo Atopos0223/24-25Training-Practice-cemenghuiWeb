@@ -26,15 +26,18 @@
       <el-table :data="meetingList" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="会议名称" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="organizer" label="组织者" width="120" />
-        <el-table-column prop="meetingTime" label="会议时间" width="180" />
+        <el-table-column prop="creator_name" label="组织者" width="120" />
+        <el-table-column label="会议时间" width="180">
+          <template #default="{row}">
+            {{ row.startTime || row.start_time }}
+          </template>
+        </el-table-column>
         <el-table-column prop="location" label="地点" width="150" />
         <el-table-column prop="status" label="状态">
           <template #default="{ row }">
             <el-tag>{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="submitTime" label="提交时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
@@ -148,7 +151,7 @@ const filteredMeetings = computed(() => {
   if (searchKeyword.value) {
     filtered = filtered.filter(meeting => 
       meeting.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-      meeting.organizer.toLowerCase().includes(searchKeyword.value.toLowerCase())
+      meeting.creator_name.toLowerCase().includes(searchKeyword.value.toLowerCase())
     )
   }
 
@@ -225,7 +228,9 @@ const fetchMeetings = async () => {
   if (res.data && res.data.code === 200) {
     meetingList.value = res.data.data.map(item => ({
       ...item,
-      name: item.title
+      name: item.title,
+      creator_name: item.creator_name,
+      startTime: item.startTime || item.start_time
     }))
   }
 }
