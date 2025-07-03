@@ -99,18 +99,20 @@ const getFinalUrl = (url) => {
   return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
-const handleBack = () => {
-  router.push('/adminhome/courses-management')
-}
 
 const handleCoverChange = (file) => {
-  coverFile.value = file.raw
-  coverPreview.value = true
-}
+  if (file) {
+    coverFile.value = file.raw; // 确保获取的是原始文件
+    coverPreview.value = true;
+    form.value.coverUrl = URL.createObjectURL(file.raw); // 本地预览
+  }
+};
 
 const handleVideoChange = (file) => {
-  videoFile.value = file.raw
-}
+  if (file) {
+    videoFile.value = file.raw;
+  }
+};
 
 // 修改loadCourse方法
 const loadCourse = async () => {
@@ -148,21 +150,27 @@ const processUrl = (url) => {
   return `${import.meta.env.VITE_API_BASE_URL || window.location.origin}${url}`
 }
 
-// 修改submitForm方法
 const submitForm = async () => {
   try {
     loading.value = true;
     const formData = new FormData();
     
+    // 添加所有必要字段（确保字段名与后端一致）
+    formData.append('id', form.value.id);
     formData.append('title', form.value.title);
     formData.append('author', form.value.author);
     formData.append('status', form.value.status);
-    if (form.value.intro) formData.append('intro', form.value.intro);
-    
-    if (coverFile.value) formData.append('cover', coverFile.value);
-    if (videoFile.value) formData.append('video', videoFile.value);
+    formData.append('intro', form.value.intro || '');
 
-    // 修改为PUT请求
+    // 处理文件上传
+    if (coverFile.value) {
+      formData.append('cover', coverFile.value);
+    }
+    if (videoFile.value) {
+      formData.append('video', videoFile.value);
+    }
+
+    // 发送PUT请求（确保路径与后端一致）
     const res = await axios.put(`/api/course/${form.value.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -171,13 +179,13 @@ const submitForm = async () => {
 
     if (res.data.success) {
       ElMessage.success('修改成功');
-      router.push('/adminhome/courses-management');
+       router.push({ name: 'CoursesManagement' });
     } else {
-      throw new Error(res.data.message || '修改失败');
+      throw new Error(res.data.message || '保存失败');
     }
   } catch (error) {
-    console.error('提交失败:', error);
-    ElMessage.error(error.message || '修改失败');
+    console.error('保存失败:', error);
+    ElMessage.error(error.message || '保存失败');
   } finally {
     loading.value = false;
   }

@@ -169,7 +169,7 @@ public class CourseController {
         return "/uploads/" + url.replaceFirst("^/uploads/", "").replaceFirst("^uploads/", "");
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public Map<String, Object> editCourse(
             @PathVariable Long id,
             @RequestParam(value = "title", required = false) String title,
