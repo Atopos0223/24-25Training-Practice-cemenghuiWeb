@@ -1,7 +1,7 @@
 <template>
-  <div class="audit-courses">
+  <div class="manage-courses">
     <div class="page-header">
-      <h2>审核课程</h2>
+      <h2>管理课程</h2>
       <div class="filter-section">
         <el-input
           v-model="searchKeyword"
@@ -17,7 +17,7 @@
     </div>
 
     <el-card>
-      <el-table :data="filteredCourses" style="width: 100%" v-loading="loading">
+      <el-table :data="paginatedCourses" style="width: 100%" v-loading="loading">
         <el-table-column 
           type="index"
           label="序号"
@@ -28,7 +28,11 @@
         <el-table-column prop="author" label="作者" width="120" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
-            <el-tag type="warning">审核中</el-tag>
+            <el-tag 
+              :type="getStatusTagType(scope.row.status)"
+            >
+              {{ scope.row.status }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="提交时间" width="180">
@@ -68,27 +72,22 @@
             </div>
           </template>
         </el-table-column>
-
-        <el-table-column prop="submitTime" label="提交时间" width="180" />
-
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="scope">
             <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
             <el-button 
               size="small" 
-              type="success" 
-              @click="approveCourse(scope.row)"
-			
+              type="primary" 
+              @click="editCourse(scope.row)"
             >
-              通过
+              编辑
             </el-button>
             <el-button 
               size="small" 
               type="danger" 
-              @click="rejectCourse(scope.row)"
-
+              @click="deleteCourse(scope.row)"
             >
-              拒绝
+              删除
             </el-button>
           </template>
         </el-table-column>
@@ -131,7 +130,7 @@
           <h3>{{ selectedCourse.title }}</h3>
           <div class="meta-info">
             <span>作者：{{ selectedCourse.author }}</span>
-            <span>状态：审核中</span>
+            <span>状态：{{ selectedCourse.status }}</span>
             <span>提交时间：{{ formatDate(selectedCourse.createTime) }}</span>
           </div>
           <div v-if="selectedCourse.coverUrl" class="cover-preview">
@@ -158,30 +157,6 @@
         </div>
       </div>
     </el-dialog>
-
-    <!-- 审核对话框 -->
-    <el-dialog v-model="showAuditDialog" :title="isApprove ? '通过审核' : '拒绝审核'" width="500px">
-      <el-form :model="auditForm" ref="auditFormRef" label-width="100px">
-        <el-form-item 
-          label="审核意见" 
-          prop="comment"
-          :rules="!isApprove ? [{ required: true, message: '拒绝原因不能为空', trigger: 'blur' }] : []"
-        >
-          <el-input
-            v-model="auditForm.comment"
-            type="textarea"
-            :rows="4"
-            :placeholder="isApprove ? '请输入通过意见（可选）' : '请输入拒绝原因'"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="showAuditDialog = false">取消</el-button>
-          <el-button type="primary" @click="submitAudit">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -190,7 +165,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Picture, VideoCameraFilled } from '@element-plus/icons-vue'
 import axios from 'axios'
-
+import { useRouter } from 'vue-router'
 // 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
@@ -198,20 +173,12 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const showDetailDialog = ref(false)
-const showAuditDialog = ref(false)
 const selectedCourse = ref(null)
-const isApprove = ref(true)
-const auditFormRef = ref()
 const videoDialogVisible = ref(false)
 const currentVideoUrl = ref('')
-
+const router = useRouter()
 // 课程数据
 const courseList = ref([])
-
-// 审核表单
-const auditForm = reactive({
-  comment: ''
-})
 
 // 计算属性
 const filteredCourses = computed(() => {
@@ -225,6 +192,12 @@ const filteredCourses = computed(() => {
   )
 })
 
+const paginatedCourses = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredCourses.value.slice(start, end)
+})
+
 // 方法
 const formatDate = (dateString) => {
   if (!dateString) return '-'
@@ -232,6 +205,14 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString()
   } catch {
     return dateString
+  }
+}
+
+const getStatusTagType = (status) => {
+  switch (status) {
+    case '已发布': return 'success'
+    case '未通过': return 'danger'
+    default: return 'info'
   }
 }
 
@@ -271,7 +252,7 @@ const previewVideo = (course) => {
     return
   }
   
-  currentVideoUrl.value = course.videoUrl
+  currentVideoUrl.value = processMediaUrl(course.videoUrl)
   videoDialogVisible.value = true
 }
 
@@ -295,79 +276,37 @@ const viewDetail = (course) => {
   showDetailDialog.value = true
 }
 
-const approveCourse = (course) => {
-  isApprove.value = true
-  selectedCourse.value = course
-  auditForm.comment = ''
-  showAuditDialog.value = true
+const editCourse = (course) => {
+  router.push(`/adminhome/courses-management/edit/${course.id}`)
 }
-
-const rejectCourse = (course) => {
-  isApprove.value = false
-  selectedCourse.value = course
-  auditForm.comment = ''
-  showAuditDialog.value = true
-}
-
-const submitAudit = async () => {
+  
+// 修改deleteCourse方法
+const deleteCourse = async (course) => {
   try {
-    // 验证表单
-    await auditFormRef.value.validate()
+    await ElMessageBox.confirm(`确定删除课程 "${course.title}" 吗？`, '提示', {
+      type: 'warning'
+    });
     
-    loading.value = true
-    const course = selectedCourse.value
-    const newStatus = isApprove.value ? '已发布' : '未通过'
+    loading.value = true;
+    // 修正删除接口路径
+    const response = await axios.delete(`/api/course/${course.id}`);
     
-    const params = new URLSearchParams();
-    params.append('id', selectedCourse.value.id);
-    params.append('action', isApprove.value ? "pass" : "reject");
-    params.append('comment', auditForm.comment);
-
-    const response = await axios.post('/api/course/audit', params);
-
     if (response.data.success) {
-      // 从列表中移除已审核的课程
-      courseList.value = courseList.value.filter(c => c.id !== course.id)
-      total.value = courseList.value.length
-      
-      ElMessage.success(`审核${isApprove.value ? '通过' : '拒绝'}成功`)
-      showAuditDialog.value = false
+      ElMessage.success('删除成功');
+      courseList.value = courseList.value.filter(c => c.id !== course.id);
+      total.value = courseList.value.length;
     } else {
-      ElMessage.error(response.data.message || '操作失败')
+      ElMessage.error(response.data.message || '删除失败');
     }
   } catch (error) {
-    if (error instanceof Error && !error.message.includes('validate')) {
-      ElMessage.error('操作失败，请重试')
-      console.error('审核课程失败:', error)
+    if (!error.toString().includes('cancel')) {
+      ElMessage.error('删除失败');
+      console.error('删除课程失败:', error);
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
-const loadCourses = async () => {
-  loading.value = true
-  try {
-    // 只获取状态为"审核中"的课程
-    const response = await axios.get('/api/course/list/auditing')
-    if (response.data.success) {
-      courseList.value = response.data.data.map(course => ({
-        ...course,
-        coverUrl: course.coverUrl ? processMediaUrl('http://localhost:8080'+course.coverUrl) : undefined,
-        videoUrl: course.videoUrl ? processMediaUrl('http://localhost:8080'+course.videoUrl) : undefined,
-        status: '审核中' // 确保状态为审核中
-      }))
-      total.value = courseList.value.length
-    } else {
-      ElMessage.error(response.data.message || '加载课程列表失败')
-    }
-  } catch (error) {
-    ElMessage.error('加载课程列表失败')
-    console.error('加载课程列表失败:', error)
-  } finally {
-    loading.value = false
-  }
-}
+};
 
 const processMediaUrl = (url) => {
   if (!url) return undefined;
@@ -381,6 +320,28 @@ const processMediaUrl = (url) => {
     : `${baseUrl}/uploads${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
+const loadCourses = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get('/api/course/list/managed')
+    if (response.data.success) {
+      courseList.value = response.data.data.map(course => ({
+        ...course,
+        coverUrl: course.coverUrl ? processMediaUrl('http://localhost:8080'+course.coverUrl) : undefined,
+        videoUrl: course.videoUrl ? processMediaUrl('http://localhost:8080'+course.videoUrl) : undefined
+      }))
+      total.value = courseList.value.length
+    } else {
+      ElMessage.error(response.data.message || '加载课程列表失败')
+    }
+  } catch (error) {
+    ElMessage.error('加载课程列表失败')
+    console.error('加载课程列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 // 生命周期
 onMounted(() => {
   loadCourses()
@@ -388,7 +349,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.audit-courses {
+.manage-courses {
   padding: 20px;
 }
 
@@ -451,12 +412,6 @@ onMounted(() => {
 
 .cover-preview {
   margin: 15px 0;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
 }
 
 .image-slot {
