@@ -1,6 +1,6 @@
 <template>
   <div class="dynamic-detail">
-    <el-button @click="router.push('/userhome/industrydynamic/list')">
+    <el-button @click="goBack">
       <el-icon><ArrowLeft /></el-icon>
       返回列表
     </el-button>
@@ -70,6 +70,14 @@ const fetchDetail = async () => {
     }
   } catch (e) {
     ElMessage.error('获取详情失败')
+  }
+}
+
+const goBack = () => {
+  if (route.path.startsWith('/adminhome')) {
+    router.push('/adminhome/manage-dynamics')
+  } else {
+    router.push('/userhome/industrydynamic/list')
   }
 }
 
