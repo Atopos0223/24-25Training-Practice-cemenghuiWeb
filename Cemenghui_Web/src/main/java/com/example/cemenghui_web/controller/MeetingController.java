@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/meeting")
@@ -44,6 +45,7 @@ public class MeetingController {
     @GetMapping("/detail/{id}")
     public Result<Meeting> getMeetingDetail(@PathVariable Long id) {
         Meeting meeting = meetingService.getMeetingById(id);
+        System.out.println("[DEBUG] Meeting detail: " + meeting);
         if (meeting != null) {
             return Result.success(meeting);
         } else {
@@ -59,5 +61,13 @@ public class MeetingController {
         } catch (Exception e) {
             return Result.error(500, "更新会议失败: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/audit")
+    public Result<?> auditMeeting(@RequestBody Map<String, Object> params) {
+        Long id = Long.valueOf(params.get("id").toString());
+        Integer status = Integer.valueOf(params.get("status").toString());
+        meetingService.auditMeeting(id, status);
+        return Result.success();
     }
 } 

@@ -29,34 +29,17 @@
         <el-table-column prop="organizer" label="组织者" width="120" />
         <el-table-column prop="meetingTime" label="会议时间" width="180" />
         <el-table-column prop="location" label="地点" width="150" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </el-tag>
+        <el-table-column prop="status" label="状态">
+          <template #default="{ row }">
+            <el-tag>{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="submitTime" label="提交时间" width="180" />
-        <el-table-column prop="auditTime" label="审核时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="success" 
-              @click="approveMeeting(scope.row)"
-            >
-              通过
-            </el-button>
-            <el-button 
-              v-if="scope.row.status === 'pending'"
-              size="small" 
-              type="danger" 
-              @click="rejectMeeting(scope.row)"
-            >
-              拒绝
-            </el-button>
+          <template #default="{ row }">
+            <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
+            <el-button size="small" type="success" @click="auditMeeting(row.id, 2)" v-if="row.status == 1">通过</el-button>
+            <el-button size="small" type="danger" @click="auditMeeting(row.id, 3)" v-if="row.status == 1">驳回</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -132,11 +115,12 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
+import { useRouter } from 'vue-router'
 
 // 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
-const statusFilter = ref('')
+const statusFilter = ref('1')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -146,6 +130,7 @@ const selectedMeeting = ref(null)
 const auditAction = ref('')
 const auditFormRef = ref()
 const meetingList = ref([])
+const router = useRouter()
 
 // 审核表单
 const auditForm = reactive({
@@ -157,7 +142,7 @@ const filteredMeetings = computed(() => {
   let filtered = meetingList.value
 
   if (statusFilter.value) {
-    filtered = filtered.filter(meeting => meeting.status === statusFilter.value)
+    filtered = filtered.filter(meeting => String(meeting.status) === statusFilter.value)
   }
 
   if (searchKeyword.value) {
@@ -180,13 +165,12 @@ const getStatusType = (status) => {
   return statusTypes[status] || 'info'
 }
 
-const getStatusText = (status) => {
-  const statusTexts = {
-    'pending': '待审核',
-    'approved': '已通过',
-    'rejected': '已拒绝'
-  }
-  return statusTexts[status] || '未知'
+const statusText = (status) => {
+  if (status === 1 || status === '1') return '未审核'
+  if (status === 2 || status === '2') return '已通过'
+  if (status === 3 || status === '3') return '被驳回'
+  if (status === 0 || status === '0') return '草稿'
+  return '未知'
 }
 
 const handleSizeChange = (val) => {
@@ -198,9 +182,8 @@ const handleCurrentChange = (val) => {
   currentPage.value = val
 }
 
-const viewDetail = (meeting) => {
-  selectedMeeting.value = meeting
-  showDetailDialog.value = true
+const viewDetail = (id) => {
+  router.push(`/adminhome/meetingmanage/detail/${id}`)
 }
 
 const approveMeeting = (meeting) => {
@@ -244,6 +227,16 @@ const fetchMeetings = async () => {
       ...item,
       name: item.title
     }))
+  }
+}
+
+const auditMeeting = async (id, status) => {
+  const res = await request.post('/api/meeting/audit', { id, status })
+  if (res.data && res.data.code === 200) {
+    ElMessage.success(status === 2 ? '审核通过' : '已驳回')
+    fetchMeetings()
+  } else {
+    ElMessage.error(res.data?.message || '操作失败')
   }
 }
 

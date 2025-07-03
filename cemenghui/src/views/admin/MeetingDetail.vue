@@ -1,10 +1,5 @@
 <template>
   <div class="meeting-detail">
-	  <el-button @click="$router.push('/userhome/meetingmanage/list')">
-	    <el-icon><ArrowLeft /></el-icon>
-	    返回列表
-	  </el-button>
-	  
     <el-card v-if="meeting">
       <h3>{{ meeting.name }}</h3>
       <el-descriptions column="2" border>
@@ -24,8 +19,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import request from '@/utils/request'
 
-const meeting = ref<any>(null)
 const route = useRoute()
+const meeting = ref<any>(null)
 
 function formatDate(dateStr: string) {
   if (!dateStr) return ''
@@ -39,12 +34,12 @@ function formatDate(dateStr: string) {
   })
 }
 
-function statusText(status) {
-  if (status === 1 || status === '1') return '待审核';
-  if (status === 2 || status === '2') return '已通过';
-  if (status === 3 || status === '3') return '未通过';
-  if (status === 0 || status === '0') return '草稿';
-  return status;
+function statusText(status: any) {
+  if (status === 1 || status === '1') return '审核中'
+  if (status === 2 || status === '2') return '已通过'
+  if (status === 3 || status === '3') return '未通过'
+  if (status === 0 || status === '0') return '草稿'
+  return status
 }
 
 onMounted(async () => {
@@ -58,3 +53,11 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.meeting-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+</style> 
