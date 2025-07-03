@@ -24,8 +24,8 @@
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button type="text" @click="handleView(row)">查看</el-button>
-          <el-button type="text" @click="handleEdit(row)">编辑</el-button>
-          <el-button type="text" @click="handleDelete(row)" style="color: red;">删除</el-button>
+          <el-button v-if="row.author_id === userId" type="text" @click="handleEdit(row)">编辑</el-button>
+          <el-button v-if="row.author_id === userId" type="text" @click="handleDelete(row)" style="color: red;">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -54,6 +54,8 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const searchKeyword = ref('')
 const router = useRouter()
+const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+const userId = userInfo.id
 
 const fetchList = async () => {
   try {

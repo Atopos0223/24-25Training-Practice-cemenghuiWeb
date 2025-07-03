@@ -29,4 +29,7 @@ public interface NewsMapper {
 
     @Update("UPDATE \"news\" SET \"title\"=#{title}, \"image\"=#{image}, \"summary\"=#{summary}, \"content\"=#{content}, \"status\"=#{status}, \"update_time\"=NOW() WHERE \"id\"=#{id}")
     int updateNews(News news);
+
+    @Update("UPDATE \"news\" SET \"status\"=#{status}, \"update_time\"=NOW() WHERE \"id\"=#{id}")
+    int auditNews(@Param("id") Integer id, @Param("status") Integer status);
 } 

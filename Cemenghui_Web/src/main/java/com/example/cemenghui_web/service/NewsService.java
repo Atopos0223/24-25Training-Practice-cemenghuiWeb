@@ -31,4 +31,8 @@ public class NewsService {
     public int updateNews(News news) {
         return newsMapper.updateNews(news);
     }
+
+    public int auditNews(Integer id, Integer status) {
+        return newsMapper.auditNews(id, status);
+    }
 } 
