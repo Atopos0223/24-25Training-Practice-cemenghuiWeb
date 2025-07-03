@@ -36,4 +36,8 @@ public class MeetingService {
     public void updateMeeting(Meeting meeting) {
         meetingMapper.updateMeeting(meeting);
     }
+
+    public void auditMeeting(Long id, Integer status) {
+        meetingMapper.updateMeetingStatus(id, status);
+    }
 } 

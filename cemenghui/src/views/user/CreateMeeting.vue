@@ -69,6 +69,8 @@ const rules = reactive<FormRules>({
 })
 
 const currentUserId = Number(localStorage.getItem('userId'))
+const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+const creatorName = userInfo.username || '';
 
 const submitForm = async () => {
   if (!formRef.value) return
@@ -77,13 +79,14 @@ const submitForm = async () => {
     // 调用后端创建会议接口
     const res = await request.post('/api/meeting/create', {
       title: form.name,
-      startTime: form.startTime,
-      endTime: form.endTime,
+      start_time: form.startTime,
+      end_time: form.endTime,
       location: form.location,
       content: form.content,
       cover: form.cover,
-      creatorId: currentUserId,
-      createTime: new Date(),
+      creator_id: currentUserId,
+      creator_name: creatorName,
+      create_time: new Date(),
       status: 1
     })
     if (res.data && res.data.code === 200) {
