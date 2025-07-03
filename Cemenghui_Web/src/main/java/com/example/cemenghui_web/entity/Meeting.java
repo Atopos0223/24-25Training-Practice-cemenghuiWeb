@@ -2,6 +2,8 @@ package com.example.cemenghui_web.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.util.Date;
+
 public class Meeting {
     private Long id;
     private String title;
@@ -15,6 +17,7 @@ public class Meeting {
     private String location;
     private String cover;
     private java.util.Date create_time;
+    private String creator_name;
 
 
     public Meeting() {}
@@ -43,20 +46,36 @@ public class Meeting {
         this.content = content;
     }
 
-    public java.util.Date getStartTime() {
+    public Date getStart_time() {
         return start_time;
     }
 
-    public void setStartTime(java.util.Date startTime) {
-        this.start_time = startTime;
+    public void setStart_time(Date start_time) {
+        this.start_time = start_time;
     }
 
-    public java.util.Date getEndTime() {
+    public Date getEnd_time() {
         return end_time;
     }
 
-    public void setEndTime(java.util.Date endTime) {
-        this.end_time = endTime;
+    public void setEnd_time(Date end_time) {
+        this.end_time = end_time;
+    }
+
+    public Long getCreator_id() {
+        return creator_id;
+    }
+
+    public void setCreator_id(Long creator_id) {
+        this.creator_id = creator_id;
+    }
+
+    public Date getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(Date create_time) {
+        this.create_time = create_time;
     }
 
     public Long getCreatorId() {
@@ -99,5 +118,28 @@ public class Meeting {
         this.create_time = createTime;
     }
 
+    public String getCreator_name() {
+        return creator_name;
+    }
 
-} 
+    public void setCreator_name(String creator_name) {
+        this.creator_name = creator_name;
+    }
+
+    @Override
+    public String toString() {
+        return "Meeting{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", startTime=" + start_time +
+                ", endTime=" + end_time +
+                ", creator_id=" + creator_id +
+                ", creator_name='" + creator_name + '\'' +
+                ", status=" + status +
+                ", location='" + location + '\'' +
+                ", cover='" + cover + '\'' +
+                ", create_time=" + create_time +
+                '}';
+    }
+}

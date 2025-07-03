@@ -79,7 +79,24 @@ const routes: RouteRecordRaw[] = [
 	    component: () => import('@/views/admin/MeetingList.vue'),
 	    meta: { title: '会议列表' }
 	  },
-	  
+	  {
+        path: '/adminhome/meetingmanage/edit',
+        name: 'AdminEditMeeting',
+        component: () => import('@/views/admin/EditMeeting.vue')
+      },
+	  {
+        path: '/adminhome/meetingmanage/detail/:id',
+        name: 'AdminMeetingDetail',
+        component: () => import('@/views/admin/MeetingDetail.vue'),
+        meta: { title: '会议详情' },
+        props: true
+      },
+	  {
+        path: '/adminhome/meetingmanage/create',
+        name: 'AdminCreateMeeting',
+        component: () => import('@/views/admin/CreateMeeting.vue'),
+        meta: { title: '创建会议' }
+      },
 	]
   },
   

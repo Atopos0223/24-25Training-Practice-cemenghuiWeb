@@ -114,6 +114,7 @@ const statusTagType = (status: string) => {
 const statusText = (status: any) => {
   if (status === 1) return '未审核'
   if (status === 2) return '已发布'
+  if (status === 3) return '未通过'
   if (status === 0) return '草稿'
   return status
 }
@@ -178,7 +179,8 @@ const fetchMeetings = async () => {
   if (res.data && res.data.code === 200) {
     allMeetings.value = res.data.data.map(item => ({
       ...item,
-      name: item.title // 字段映射，兼容表格 prop="name"
+      name: item.title, // 字段映射，兼容表格 prop="name"
+      startTime: item.start_time // 字段映射，兼容表格 prop="startTime"
     }))
   }
 }

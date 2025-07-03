@@ -21,7 +21,8 @@
       <el-button type="primary" @click="filterMeetings">搜索</el-button>
     </div>
     
-    <el-table :data="filteredMeetings" border style="width: 100%">
+    <el-table :data="allMeetings" border style="width: 100%">
+      <el-table-column type="index" label="序号" width="60" />
       <el-table-column prop="name" label="会议名称" width="180"/>
       <el-table-column prop="startTime" label="开始时间" width="180">
         <template #default="{row}">
@@ -31,26 +32,14 @@
       <el-table-column prop="location" label="会议地点"/>
       <el-table-column prop="status" label="状态">
         <template #default="{row}">
-          <el-tag :type="statusTagType(row.status)">
-            {{ row.status }}
-          </el-tag>
+          <el-tag>{{ statusText(row.status) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="220">
         <template #default="{row}">
           <el-button size="small" @click="viewDetail(row.id)">查看</el-button>
-          <el-button 
-            size="small" 
-            type="warning" 
-            @click="editMeeting(row)"
-            v-if="row.status === '未审核'"
-          >编辑</el-button>
-          <el-button 
-            size="small" 
-            type="danger" 
-            @click="deleteMeeting(row.id)"
-            v-if="row.status === '未审核'"
-          >删除</el-button>
+          <el-button size="small" type="warning" @click="editMeeting(row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -69,6 +58,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const router = useRouter()
 
@@ -97,15 +87,12 @@ const formatDateTime = (dateStr: string) => {
   })
 }
 
-const statusTagType = (status: string) => {
-  const map: Record<string, string> = {
-    '已发布': 'success',
-    '未审核': '',
-    '审核中': 'warning',
-    '已通过': 'success',
-    '未通过': 'danger'
-  }
-  return map[status] || ''
+const statusText = (status) => {
+  if (status === 1 || status === '1') return '未审核'
+  if (status === 2 || status === '2') return '已发布'
+  if (status === 3 || status === '3') return '未通过'
+  if (status === 0 || status === '0') return '草稿'
+  return status
 }
 
 // 过滤和分页
@@ -132,19 +119,31 @@ const filterMeetings = () => {
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/meeting-manage/detail/${id}`)
+  router.push(`/adminhome/meetingmanage/detail/${id}`)
 }
 
 const editMeeting = (row: any) => {
-  router.push({
-    path: '/meeting-manage/create',
-    query: { id: row.id }
-  })
+  router.push({ path: '/adminhome/meetingmanage/edit', query: { id: row.id } })
 }
 
-const deleteMeeting = (id: number) => {
-  allMeetings.value = allMeetings.value.filter(m => m.id !== id)
-  filterMeetings()
+const confirmDeleteMeeting = (id: number) => {
+  ElMessageBox.confirm(
+    '确定要删除该会议吗？此操作不可恢复！',
+    '删除确认',
+    {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    const res = await request.delete(`/api/meeting/delete/${id}`)
+    if (res.data && res.data.code === 200) {
+      ElMessage.success('删除成功')
+      fetchMeetings()
+    } else {
+      ElMessage.error(res.data?.message || '删除失败')
+    }
+  }).catch(() => {})
 }
 
 const goToCreate = () => {
@@ -156,7 +155,8 @@ const fetchMeetings = async () => {
   if (res.data && res.data.code === 200) {
     allMeetings.value = res.data.data.map(item => ({
       ...item,
-      name: item.title // 字段映射，兼容表格 prop="name"
+      name: item.title, // 字段映射，兼容表格 prop="name"
+      startTime: item.start_time // 字段映射，兼容表格 prop="startTime"
     }))
   }
 }

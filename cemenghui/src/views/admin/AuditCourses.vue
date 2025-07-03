@@ -50,7 +50,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="submitTime" label="提交时间" width="180" />
-        <el-table-column prop="auditTime" label="审核时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="scope">
             <el-button size="small" @click="viewDetail(scope.row)">查看</el-button>
