@@ -24,23 +24,18 @@
         <el-button type="primary" @click="filterMeetings">搜索</el-button>
       </div>
       
-      <el-table :data="allMeetings" border style="width: 100%">
+      <el-table :data="filteredMeetings" border style="width: 100%">
         <el-table-column prop="id" label="序号" width="80" />
         <el-table-column prop="name" label="会议名称" min-width="120" />
-        <el-table-column prop="creator_name" label="创建人" width="100" />
         <el-table-column prop="startTime" label="开始时间" width="160" />
-        <el-table-column prop="location" label="会议地点"/>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{row}">
-            <el-tag>{{ statusText(row.status) }}</el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column prop="location" label="会议地点" width="120" />
+        <el-table-column prop="status" label="状态" width="100" />
         <el-table-column label="操作" width="360">
           <template #default="{row}">
             <div class="button-row">
               <el-button size="small" type="primary" @click="viewDetail(row.id)">查看</el-button>
-              <el-button size="small" type="warning" @click="editMeeting(row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)">删除</el-button>
+              <el-button size="small" type="warning" @click="editMeeting(row)" v-if="row.creatorId === currentUserId">编辑</el-button>
+              <el-button size="small" type="danger" @click="confirmDeleteMeeting(row.id)" v-if="row.creatorId === currentUserId">删除</el-button>
             </div>
           </template>
         </el-table-column>
@@ -78,6 +73,8 @@ const pagination = reactive({
   total: 0
 })
 
+const currentUserId = Number(localStorage.getItem('userId'))
+
 const formatDateTime = (dateStr: string) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
@@ -90,11 +87,22 @@ const formatDateTime = (dateStr: string) => {
   })
 }
 
-const statusText = (status) => {
-  if (status === 1 || status === '1') return '未审核'
-  if (status === 2 || status === '2') return '已发布'
-  if (status === 3 || status === '3') return '未通过'
-  if (status === 0 || status === '0') return '草稿'
+const statusTagType = (status: string) => {
+  const map: Record<string, string> = {
+    '已发布': 'success',
+    '未审核': '',
+    '审核中': 'warning',
+    '已通过': 'success',
+    '未通过': 'danger'
+  }
+  return map[status] || ''
+}
+
+const statusText = (status: any) => {
+  if (status === 1) return '未审核'
+  if (status === 2) return '已发布'
+  if (status === 3) return '未通过'
+  if (status === 0) return '草稿'
   return status
 }
 
@@ -122,14 +130,14 @@ const filterMeetings = () => {
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/adminhome/meetingmanage/detail/${id}`)
+  router.push(`/userhome/meetingmanage/detail/${id}`)
 }
 
 const editMeeting = (row: any) => {
-  router.push({ path: '/adminhome/meetingmanage/edit', query: { id: row.id } })
+  router.push({ path: '/userhome/meetingmanage/edit', query: { id: row.id } })
 }
 
-const confirmDeleteMeeting = (id: number) => {
+const confirmDeleteMeeting = (id) => {
   ElMessageBox.confirm(
     '确定要删除该会议吗？此操作不可恢复！',
     '删除确认',
@@ -150,7 +158,7 @@ const confirmDeleteMeeting = (id: number) => {
 }
 
 const goToCreate = () => {
-  router.push('/adminhome/create-meeting')
+  router.push('/userhome/meetingmanage/create')
 }
 
 const fetchMeetings = async () => {
