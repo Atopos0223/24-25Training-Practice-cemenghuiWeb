@@ -21,7 +21,7 @@ public class CourseController {
     @Autowired
     private CourseMapper courseMapper;
 
-    private static final String UPLOAD_DIR = "/var/uploads/";  // 实际存储路径
+    private static final String UPLOAD_DIR = "uploads/";  // 实际存储路径
     private static final String UPLOAD_PATH = "/uploads/";     // URL访问路径
 
     @PostMapping("/add")

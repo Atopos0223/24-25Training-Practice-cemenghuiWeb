@@ -1,6 +1,7 @@
 package com.example.cemenghui_web.entity;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class MeetingAttend {
     private Long id;
@@ -68,4 +69,4 @@ public class MeetingAttend {
     public void setArrivalTime(Timestamp arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
-} 
+}

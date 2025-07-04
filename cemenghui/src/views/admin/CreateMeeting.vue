@@ -80,18 +80,21 @@ const submitForm = async () => {
   if (!formRef.value) return
   try {
     await formRef.value.validate()
-    // 调用后端创建会议接口
-    const res = await request.post('/api/meeting/create', {
-      title: form.name,
-      start_time: form.startTime,
-      end_time: form.endTime,
-      location: form.location,
-      content: form.content,
-      cover: form.cover,
-      creator_id: currentUserId,
-      creator_name: creatorName,
-      create_time: new Date(),
-      status: 1
+    // 构造 FormData 以适配后端 @RequestParam
+    const formData = new FormData()
+    formData.append('title', form.name)
+    formData.append('start_time', form.startTime)
+    formData.append('end_time', form.endTime)
+    formData.append('location', form.location)
+    formData.append('content', form.content)
+    formData.append('cover', form.cover)
+    formData.append('creator_id', currentUserId)
+    formData.append('creator_name', creatorName)
+    formData.append('create_time', new Date().toISOString())
+    formData.append('status', 1)
+
+    const res = await request.post('/api/meeting/create', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && res.data.code === 200) {
       ElMessage.success('会议创建成功')
