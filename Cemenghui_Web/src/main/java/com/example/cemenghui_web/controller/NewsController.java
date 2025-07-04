@@ -35,20 +35,24 @@ public class NewsController {
 
     @PostMapping("/upload")
     public Result<?> upload(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return Result.error(400, "文件为空");
-        }
         try {
-            // 保存路径，可根据实际情况修改
-            String uploadDir = System.getProperty("user.dir") + "/uploads/";
-            java.io.File dir = new java.io.File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            java.io.File dest = new java.io.File(uploadDir + fileName);
-            file.transferTo(dest);
-            // 假设前端可通过 /uploads/ 访问图片
-            String url = "/uploads/" + fileName;
-            return Result.success(url);
+            if (file.isEmpty()) {
+                return Result.error(400, "文件为空");
+            }
+            try {
+                // 保存路径，可根据实际情况修改
+                String uploadDir = System.getProperty("user.dir") + "/uploads/";
+                java.io.File dir = new java.io.File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                java.io.File dest = new java.io.File(uploadDir + fileName);
+                file.transferTo(dest);
+                // 假设前端可通过 /uploads/ 访问图片
+                String url = "/uploads/" + fileName;
+                return Result.success(url);
+            } catch (Exception e) {
+                return Result.error(500, "上传失败: " + e.getMessage());
+            }
         } catch (Exception e) {
             return Result.error(500, "上传失败: " + e.getMessage());
         }
