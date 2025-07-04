@@ -32,7 +32,11 @@
         <el-table-column prop="creator_name" label="组织者" width="100" />
         <el-table-column prop="startTime" label="会议时间" width="160" />
         <el-table-column prop="location" label="地点" width="120" />
-        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="scope">
+            {{ statusText(scope.row.status) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
             <div class="button-row">

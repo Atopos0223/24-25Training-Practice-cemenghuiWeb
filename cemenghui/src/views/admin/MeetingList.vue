@@ -24,7 +24,7 @@
         <el-button type="primary" @click="filterMeetings">搜索</el-button>
       </div>
       
-      <el-table :data="allMeetings" border style="width: 100%">
+      <el-table :data="filteredMeetings" border style="width: 100%">
         <el-table-column prop="id" label="序号" width="80" />
         <el-table-column prop="name" label="会议名称" min-width="120" />
         <el-table-column prop="creator_name" label="创建人" width="100" />
