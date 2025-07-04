@@ -71,8 +71,6 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="submitTime" label="提交时间" width="160" />
-
         <el-table-column label="操作" width="360">
           <template #default="scope">
             <div class="button-row">
