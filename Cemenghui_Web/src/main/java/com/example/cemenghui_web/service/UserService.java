@@ -12,7 +12,7 @@ public class UserService {
     private UserMapper userMapper;
 
     public User Login(User user){
-        System.out.println(userMapper.LoginSearch(user));
+
         return userMapper.LoginSearch(user);
     }
 
