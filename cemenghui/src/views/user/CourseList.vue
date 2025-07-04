@@ -59,9 +59,9 @@
         <el-table-column label="操作" width="360">
           <template #default="{row}">
             <div class="button-row">
-              <el-button type="primary" size="small" @click="viewDetail(row)">查看</el-button>
-              <el-button type="warning" size="small" @click="editCourse(row)" v-if="row.canEdit">编辑</el-button>
-              <el-button type="danger" size="small" @click="deleteCourse(row)" v-if="row.canEdit">删除</el-button>
+              <el-button type="primary" size="small" @click="viewDetail(row.id)">查看</el-button>
+              <el-button type="warning" size="small" @click="editCourse(row)" >编辑</el-button>
+              <el-button type="danger" size="small" @click="deleteCourse(row.id)">删除</el-button>
             </div>
           </template>
         </el-table-column>
