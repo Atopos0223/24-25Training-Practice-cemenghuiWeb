@@ -6,6 +6,10 @@ import com.example.cemenghui_web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -75,6 +79,60 @@ public class UserController {
             }
         } catch (Exception e) {
             return Result.error(500, "找回密码失败: " + e.getMessage());
+        }
+    }
+
+    // 新增用户（管理员用）
+    @PostMapping("/addUser")
+    public Result<?> addUser(@RequestBody User user) {
+
+        userService.insertUser(user);
+        return Result.success();
+    }
+
+    // 查询用户列表（可加条件、分页参数）
+    @GetMapping("/userList")
+    public Result<?> userList(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String company,
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) Integer is_super,
+            @RequestParam(required = false) Integer gender,
+            HttpServletResponse response
+    ) {
+        response.setHeader("Cache-Control", "no-cache");
+        return Result.success(userService.selectUserList(username, phone, company, status, is_super, gender));
+    }
+
+    // 删除单个用户
+    @DeleteMapping("/deleteUser/{id}")
+    public Result<?> deleteUser(@PathVariable Integer id) {
+        userService.deleteUserById(id);
+        return Result.success();
+    }
+
+    // 批量删除用户
+    @PostMapping("/deleteUsers")
+    public Result<?> deleteUsers(@RequestBody Map<String, List<Integer>> request) {
+        List<Integer> ids = request.get("ids");
+        userService.deleteUsersByIds(ids);
+        return Result.success();
+    }
+
+    // 更新用户状态
+    @PostMapping("/updateUserStatus")
+    public Result<?> updateUserStatus(@RequestBody Map<String, Object> requestBody) {
+        // 手动从Map中提取参数并转换类型
+        Integer id = (Integer) requestBody.get("id");
+        Integer status = (Integer) requestBody.get("status");
+
+        // 调用服务层
+        int result = userService.updateUserStatus(id, status);
+        if (result > 0) {
+            return Result.success();
+        } else {
+            return Result.error(400, "更新用户状态失败");
         }
     }
 }

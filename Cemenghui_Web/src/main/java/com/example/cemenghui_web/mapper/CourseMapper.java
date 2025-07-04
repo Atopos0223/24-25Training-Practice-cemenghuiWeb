@@ -11,7 +11,7 @@ public interface CourseMapper {
     // 使用双引号包裹字段名（与UserMapper风格一致）
     @Insert("INSERT INTO \"course\" (\"title\", \"author\", \"coverUrl\", \"intro\", \"videoUrl\", \"status\", \"createTime\") " +
             "VALUES (#{title}, #{author}, #{coverUrl}, #{intro}, #{videoUrl}, #{status}, NOW())")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int insertCourse(Course course);
 
     @Select("SELECT * FROM course WHERE id = #{id}")
@@ -28,4 +28,10 @@ public interface CourseMapper {
 
     @Delete("DELETE FROM \"course\" WHERE \"id\"=#{id}")
     int deleteById(Long id);
+
+    @Select("SELECT * FROM course WHERE status = #{status}")
+    List<Course> selectByStatus(@Param("status") String status);
+
+    @Select("SELECT * FROM course WHERE status != #{status}")
+    List<Course> selectByStatusNot(@Param("status") String status);
 }

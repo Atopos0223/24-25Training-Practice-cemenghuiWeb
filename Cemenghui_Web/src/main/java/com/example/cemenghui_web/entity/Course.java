@@ -11,8 +11,11 @@ public class Course {
     private String videoUrl;
     private String status;
     private Date createTime;
+    private String auditComment;
+
+
     // Getter & Setter
-    public Integer getId() { return id; }
+    public  int getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
     public String getTitle() { return title; }
@@ -36,5 +39,7 @@ public class Course {
     public Date getCreateTime() { return createTime; }
     public void setCreateTime(Date createTime) { this.createTime = createTime; }
 
+    public String getAuditComment() { return auditComment; }
+    public void setAuditComment(String auditComment) { this.auditComment = auditComment; }
 
 }

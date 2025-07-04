@@ -60,6 +60,7 @@
 					<el-menu-item index="/userhome/coursemanage/list" class="menu-item">
 					  <span>课程列表</span>
 					</el-menu-item>
+
 				  </el-sub-menu>
 				  
 				  <!-- 会议管理下拉菜单 -->
@@ -75,7 +76,7 @@
 					  <span>会议列表</span>
 					</el-menu-item>
 					<el-menu-item index="/userhome/meetingmanage/audit" class="menu-item">
-					  <span>审核管理</span>
+					  <span>审核状态</span>
 					</el-menu-item>
 				  </el-sub-menu>
 				</el-menu>
@@ -168,6 +169,15 @@ const logout = () => {
   padding: 20px;
   overflow-y: auto;
   background: #f5f7fa;
+}
+
+.main-title {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* 过渡动画 */

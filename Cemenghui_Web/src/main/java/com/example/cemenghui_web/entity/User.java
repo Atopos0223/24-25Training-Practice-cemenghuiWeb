@@ -1,5 +1,7 @@
 package com.example.cemenghui_web.entity;
 
+import java.sql.Timestamp;
+
 public class User {
     private Integer id;
     private String company;
@@ -11,6 +13,7 @@ public class User {
     private Integer gender;
     private Integer status;
     private Integer is_super;
+    private Timestamp create_time;
 
     public Integer getId() {
         return id;
@@ -90,6 +93,14 @@ public class User {
 
     public void setIs_super(Integer is_super) {
         this.is_super = is_super;
+    }
+
+    public Timestamp getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(Timestamp create_time) {
+        this.create_time = create_time;
     }
 
     @Override

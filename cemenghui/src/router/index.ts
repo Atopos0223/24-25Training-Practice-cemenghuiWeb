@@ -17,69 +17,117 @@ const routes: RouteRecordRaw[] = [
 	children: [
 		
 	  {
-	    path: '/info-management',
-	    name: 'InfoManagement',
-	    component: () => import('../views/InfoManagementView.vue'),
-	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
+	    path: 'info-management',
+	    name: 'AdminInfoManagement',
+	    component: () => import('@/views/admin/userManagement/InfoManagementView.vue'),
+	    meta: { title: '信息管理' }
 	  },
 	  {
-        path: '/permission-management',
+        path: 'permission-management',
         name: 'PermissionManagement',
-        component: () => import('@/views/admin/PermissionManagement.vue'),
+        component: () => import('@/views/admin/userManagement/PermissionManagement.vue'),
         meta: { title: '权限管理' }
       },
 	  {
-        path: '/audit-news',
+        path: 'audit-news',
         name: 'AuditNews',
-        component: () => import('@/views/admin/AuditNews.vue'),
+        component: () => import('@/views/admin/dynamicManagement/AuditNews.vue'),
         meta: { title: '审核资讯' }
       },
 	  {
-        path: '/audit-courses',
+	    path: 'manage-dynamics',
+	    component: () => import('@/views/admin/dynamicManagement/DynamicList.vue'),
+	    meta: { title: '动态列表' }
+	  },
+	  {
+	    path: 'publish',
+	    name: 'AdminPublishDynamic',
+	    component: () => import('../views/admin/dynamicManagement/PublishDynamic.vue'),
+		meta: { title: '发布动态' }
+	  },
+	  {
+	  
+	    path: 'dynamic-detail/:id',
+	    name: 'AdminDynamicDetail',
+	    component: () => import('@/views/admin/dynamicManagement/DynamicDetail.vue'),
+	    meta: { title: '动态详情' },
+	    props: true
+	  },
+	  {
+	    path: 'edit-dynamic/:id',
+	    name: 'AdminEditDynamic',
+	    component: () => import('@/views/admin/dynamicManagement/EditDynamic.vue'),
+	    meta: { title: '编辑动态' },
+	    props: true
+	  },
+	  {
+        path: 'audit-courses',
         name: 'AuditCourses',
-        component: () => import('@/views/admin/AuditCourses.vue'),
+        component: () => import('@/views/admin/courseManagement/AuditCourses.vue'),
         meta: { title: '审核课程' }
       },
 	  {
-        path: '/audit-meetings',
+
+	  path: '/courses-management',
+	    name: 'CoursesManagement',
+	    component: () => import('@/views/admin/courseManagement/CoursesManagement.vue'),
+	    meta: { title: '管理课程' }
+	  },
+	{
+	path: 'courses-management/edit/:id',
+	  name: 'EditCourse',
+	  component: () => import('@/views/admin/courseManagement/EditCourse.vue'),
+	  meta: { title: '编辑课程' },
+	  props: true  // 允许将路由参数传递给组件
+	},
+	{
+	  path: 'manage-courses',
+	  component: () => import('@/views/admin/courseManagement/CourseList.vue'),
+	  meta: { title: '课程列表' }
+	},
+	
+	  {
+    
+        path: 'audit-meetings',
+
         name: 'AuditMeetings',
-        component: () => import('@/views/admin/AuditMeetings.vue'),
+        component: () => import('@/views/admin/meetingManagement/AuditMeetings.vue'),
         meta: { title: '审核会议' }
       },
 	  {
-        path: '/create-meeting',
+        path: 'create-meeting',
         name: 'CreateMeeting',
-        component: () => import('@/views/admin/CreateMeeting.vue'),
+        component: () => import('@/views/admin/meetingManagement/CreateMeeting.vue'),
         meta: { title: '创建会议' }
       },
+	  
+	  
+	  
 	  {
-        path: '/personal-center',
-        name: 'PersonalCenter',
-        component: () => import('@/views/admin/PersonalCenter.vue'),
-        meta: { title: '个人中心' }
-      },
-	  {
-        path: '/manage-dynamics',
-        component: () => import('@/views/admin/DynamicList.vue'),
-        meta: { title: '动态列表' }
-      },
-	  {
-	    path: '/publish',
-	    name: 'InfoManagement',
-	    component: () => import('../views/user/PublishDynamic.vue'),
-	    // 移除了 requiresAdmin 元信息，因为不再需要权限验证
-	  },
-	  {
-	    path: '/manage-courses',
-	    component: () => import('@/views/admin/CourseList.vue'),
-	    meta: { title: '课程列表' }
-	  },
-	  {
-	    path: '/manage-meetings',
-	    component: () => import('@/views/admin/MeetingList.vue'),
+	    path: 'manage-meetings',
+	    component: () => import('@/views/admin/meetingManagement/MeetingList.vue'),
 	    meta: { title: '会议列表' }
 	  },
 	  
+      {
+        path: '/adminhome/meetingmanage/edit',
+        name: 'AdminEditMeeting',
+        component: () => import('@/views/admin/meetingManagement/EditMeeting.vue')
+      },
+	  {
+        path: '/adminhome/meetingmanage/detail/:id',
+        name: 'AdminMeetingDetail',
+        component: () => import('@/views/admin/meetingManagement/MeetingDetail.vue'),
+        meta: { title: '会议详情' },
+        props: true
+      },
+	  {
+        path: '/adminhome/meetingmanage/create',
+        name: 'AdminCreateMeeting',
+        component: () => import('@/views/admin/meetingManagement/CreateMeeting.vue'),
+        meta: { title: '创建会议' }
+      },
+
 	]
   },
   
@@ -96,19 +144,19 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'basic-info',
         name: 'basicInfo',
-        component: () => import('@/views/user/BasicInfo.vue'),
+        component: () => import('@/views/user/userInfo/BasicInfo.vue'),
         meta: { title: '基本资料修改', defaultTab: 'base' }
       },
       {
         path: 'change-password',
         name: 'changePassword',
-        component: () => import('@/views/user/ChangePassword.vue'),
+        component: () => import('@/views/user/userInfo/ChangePassword.vue'),
         meta: { title: '修改密码', defaultTab: 'password' }
       },
       {
         path: 'view-info',
         name: 'viewInfo',
-        component: () => import('@/views/user/ViewInfo.vue'),
+        component: () => import('@/views/user/userInfo/ViewInfo.vue'),
         meta: { title: '查看信息', defaultTab: 'view' }
       },
       {
@@ -117,18 +165,26 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'publish',
-            component: () => import('@/views/user/PublishDynamic.vue'),
+            component: () => import('@/views/user/dynamic/PublishDynamic.vue'),
             meta: { title: '发布动态' }
           },
           {
             path: 'list',
-            component: () => import('@/views/user/DynamicList.vue'),
+            component: () => import('@/views/user/dynamic/DynamicList.vue'),
             meta: { title: '动态列表' }
           },
           {
             path: 'detail/:id',
-            component: () => import('@/views/user/DynamicDetail.vue'),
+            name: 'DynamicDetail',
+            component: () => import('@/views/user/dynamic/DynamicDetail.vue'),
             meta: { title: '动态详情' },
+            props: true
+          },
+          {
+            path: 'edit/:id',
+            name: 'EditDynamic',
+            component: () => import('@/views/user/dynamic/EditDynamic.vue'),
+            meta: { title: '编辑动态' },
             props: true
           }
         ]
@@ -139,29 +195,29 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'add',
-            component: () => import('@/views/user/Addcourse.vue'),
+            component: () => import('@/views/user/course/Addcourse.vue'),
             meta: { title: '添加课程' }
           },
           {
             path: 'list',
-            component: () => import('@/views/user/CourseList.vue'),
+            component: () => import('@/views/user/course/CourseList.vue'),
             meta: { title: '课程列表' }
           },
           {
             path: 'audit',
-            component: () => import('@/views/user/AuditManage.vue'),
+            component: () => import('@/views/user/course/AuditManage.vue'),
             meta: { title: '审核管理' },
             props: true
           },
           {
             path: 'edit/:id',
-            component: () => import('@/views/user/EditCourse.vue'),
+            component: () => import('@/views/user/course/EditCourse.vue'),
             meta: { title: '编辑' },
             props: true
           },
           {
             path: 'detail/:id',
-            component: () => import('@/views/user/CourseDetail.vue'),
+            component: () => import('@/views/user/course/CourseDetail.vue'),
             meta: { title: '课程详情' },
             props: true
           }
@@ -173,29 +229,29 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: 'create',
-            component: () => import('@/views/user/CreateMeeting.vue'),
+            component: () => import('@/views/user/meeting/CreateMeeting.vue'),
             meta: { title: '创建会议' }
           },
           {
             path: 'list',
-            component: () => import('@/views/user/MeetingList.vue'),
+            component: () => import('@/views/user/meeting/MeetingList.vue'),
             meta: { title: '会议列表' }
           },
           {
             path: 'audit',
-            component: () => import('@/views/user/AuditMeeting.vue'),
+            component: () => import('@/views/user/meeting/AuditMeeting.vue'),
             meta: { title: '审核管理' },
             props: true
           },
           {
             path: 'detail/:id',
-            component: () => import('@/views/user/MeetingDetail.vue'),
+            component: () => import('@/views/user/meeting/MeetingDetail.vue'),
             meta: { title: '会议详情' },
             props: true
           },
           {
             path: 'edit',
-            component: () => import('@/views/user/EditMeeting.vue'),
+            component: () => import('@/views/user/meeting/EditMeeting.vue'),
             meta: { title: '编辑会议' }
           }
         ]
