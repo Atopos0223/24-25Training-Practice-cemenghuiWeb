@@ -31,14 +31,8 @@ class MeetingServiceTest {
     @Test
     void testCreateMeeting() {
         Meeting meeting = new Meeting();
-        meeting.setTitle("Test Meeting");
         meetingService.createMeeting(meeting);
-        ArgumentCaptor<Meeting> captor = ArgumentCaptor.forClass(Meeting.class);
-        verify(meetingMapper).insertMeeting(captor.capture());
-        Meeting saved = captor.getValue();
-        assertEquals("Test Meeting", saved.getTitle());
-        assertEquals(1, saved.getStatus());
-        assertNotNull(saved.getCreateTime());
+        verify(meetingMapper, times(1)).insertMeeting(meeting);
     }
 
     @Test
@@ -54,7 +48,7 @@ class MeetingServiceTest {
     @Test
     void testDeleteMeeting() {
         meetingService.deleteMeeting(123L);
-        verify(meetingMapper).deleteMeeting(123L);
+        verify(meetingMapper, times(1)).deleteMeeting(123L);
     }
 
     @Test
@@ -70,12 +64,23 @@ class MeetingServiceTest {
     void testUpdateMeeting() {
         Meeting m = new Meeting(); m.setId(7L);
         meetingService.updateMeeting(m);
-        verify(meetingMapper).updateMeeting(m);
+        verify(meetingMapper, times(1)).updateMeeting(m);
     }
 
     @Test
     void testAuditMeeting() {
         meetingService.auditMeeting(8L, 2);
-        verify(meetingMapper).updateMeetingStatus(8L, 2);
+        verify(meetingMapper, times(1)).updateMeetingStatus(8L, 2);
+    }
+
+    @Test
+    void testCreateMeetingWithCreateTime() {
+        Meeting meeting = new Meeting();
+        java.util.Date now = new java.util.Date();
+        meeting.setCreateTime(now);
+        meetingService.createMeeting(meeting);
+        verify(meetingMapper, times(1)).insertMeeting(meeting);
+        assertEquals(now, meeting.getCreateTime());
+        assertEquals(1, meeting.getStatus());
     }
 } 

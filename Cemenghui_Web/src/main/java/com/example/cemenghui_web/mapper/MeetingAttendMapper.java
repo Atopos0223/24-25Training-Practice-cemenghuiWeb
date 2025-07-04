@@ -12,4 +12,6 @@ public interface MeetingAttendMapper {
 
     @Select("SELECT * FROM meeting_attend")
     java.util.List<MeetingAttend> selectAllMeetingAttend();
-} 
+
+
+}

@@ -85,7 +85,7 @@ public class UserController {
     // 新增用户（管理员用）
     @PostMapping("/addUser")
     public Result<?> addUser(@RequestBody User user) {
-        System.out.println("收到新增用户请求：" + user);
+
         userService.insertUser(user);
         return Result.success();
     }
