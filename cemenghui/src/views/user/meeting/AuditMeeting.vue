@@ -26,8 +26,6 @@
         <template #default="{row}">
           <div class="button-row">
             <el-button size="small" type="primary" plain @click="viewDetail(row.id)">查看</el-button>
-            <el-button size="small" type="success" plain @click="approveAudit(row.id)" v-if="row.status === '1'">通过</el-button>
-            <el-button size="small" type="danger" plain @click="rejectAudit(row.id)" v-if="row.status === '1'">拒绝</el-button>
           </div>
         </template>
       </el-table-column>
@@ -88,18 +86,6 @@ const loadAudits = () => {
   // 简单分页
   const startIdx = (pagination.current - 1) * pagination.size
   allAudits.value = result.slice(startIdx, startIdx + pagination.size)
-}
-
-const approveAudit = (id: number) => {
-  const item = rawAudits.value.find(a => a.id === id)
-  if (item) item.status = '2'
-  loadAudits()
-}
-
-const rejectAudit = (id: number) => {
-  const item = rawAudits.value.find(a => a.id === id)
-  if (item) item.status = '3'
-  loadAudits()
 }
 
 const viewDetail = (id: any) => {

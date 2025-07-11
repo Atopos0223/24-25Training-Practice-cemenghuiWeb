@@ -26,8 +26,8 @@
         <template #default="{row}">
           <div class="button-row">
             <el-button size="small" type="primary" plain @click="viewDetail(row.id)">查看</el-button>
-            <el-button size="small" type="success" plain @click="approveAudit(row.id)" v-if="row.status === '1'">通过</el-button>
-            <el-button size="small" type="danger" plain @click="rejectAudit(row.id)" v-if="row.status === '1'">拒绝</el-button>
+            <el-button size="small" type="success" plain @click="approveAudit(row.id)" v-if="row.status == 1">通过</el-button>
+            <el-button size="small" type="danger" plain @click="rejectAudit(row.id)" v-if="row.status == 1">拒绝</el-button>
           </div>
         </template>
       </el-table-column>
@@ -47,6 +47,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import router from '@/router'
 import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
 
 const rawAudits = ref([])
 const allAudits = ref([])
@@ -90,20 +91,48 @@ const loadAudits = () => {
   allAudits.value = result.slice(startIdx, startIdx + pagination.size)
 }
 
-const approveAudit = (id: number) => {
-  const item = rawAudits.value.find(a => a.id === id)
-  if (item) item.status = '2'
-  loadAudits()
+const approveAudit = async (id: number) => {
+  try {
+    const res = await request.post('/api/meeting/audit', {
+      id: id,
+      status: 2  // 2表示通过
+    })
+    
+    if (res.data && res.data.code === 200) {
+      ElMessage.success('审核通过成功')
+      // 重新获取数据
+      await fetchAudits()
+    } else {
+      ElMessage.error(res.data?.message || '审核失败')
+    }
+  } catch (error) {
+    console.error('审核失败:', error)
+    ElMessage.error('审核失败，请重试')
+  }
 }
 
-const rejectAudit = (id: number) => {
-  const item = rawAudits.value.find(a => a.id === id)
-  if (item) item.status = '3'
-  loadAudits()
+const rejectAudit = async (id: number) => {
+  try {
+    const res = await request.post('/api/meeting/audit', {
+      id: id,
+      status: 3  // 3表示拒绝
+    })
+    
+    if (res.data && res.data.code === 200) {
+      ElMessage.success('审核拒绝成功')
+      // 重新获取数据
+      await fetchAudits()
+    } else {
+      ElMessage.error(res.data?.message || '审核失败')
+    }
+  } catch (error) {
+    console.error('审核失败:', error)
+    ElMessage.error('审核失败，请重试')
+  }
 }
 
 const viewDetail = (id: any) => {
-  router.push(`/userhome/meetingmanage/detail/${id}`);
+  router.push(`/adminhome/meetingmanage/detail/${id}`);
 };
 
 const statusText = (status: any) => {
@@ -124,6 +153,8 @@ const fetchAudits = async () => {
     loadAudits()
   }
 }
+
+
 
 onMounted(() => {
   fetchAudits()

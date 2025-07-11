@@ -21,7 +21,7 @@
           end-placeholder="结束日期"
           value-format="YYYY-MM-DD"
         />
-        <el-button type="primary" @click="filterMeetings">搜索</el-button>
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
       </div>
       
       <el-table :data="filteredMeetings" border style="width: 100%">
@@ -29,7 +29,13 @@
         <el-table-column prop="name" label="会议名称" min-width="120" />
         <el-table-column prop="startTime" label="开始时间" width="160" />
         <el-table-column prop="location" label="会议地点" width="120" />
-        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{row}">
+            <el-tag :type="statusTagType(row.status)">
+              {{ statusText(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="360">
           <template #default="{row}">
             <div class="button-row">
@@ -45,7 +51,7 @@
         v-model:current-page="pagination.current"
         v-model:page-size="pagination.size"
         :total="pagination.total"
-        @current-change="filterMeetings"
+        @current-change="handlePageChange"
         layout="total, prev, pager, next"
       />
     </div>
@@ -61,6 +67,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 const router = useRouter()
 
 const allMeetings = ref([])
+const filteredMeetings = ref([])
 
 const searchParams = reactive({
   name: '',
@@ -87,31 +94,30 @@ const formatDateTime = (dateStr: string) => {
   })
 }
 
-const statusTagType = (status: string) => {
-  const map: Record<string, string> = {
-    '已发布': 'success',
-    '未审核': '',
-    '审核中': 'warning',
-    '已通过': 'success',
-    '未通过': 'danger'
+const statusTagType = (status: any) => {
+  const map: Record<string | number, string> = {
+    1: 'warning', // 审核中
+    2: 'success', // 已通过
+    3: 'danger',  // 未通过
+    0: 'info'     // 草稿
   }
   return map[status] || ''
 }
 
 const statusText = (status: any) => {
-  if (status === 1) return '未审核'
-  if (status === 2) return '已发布'
-  if (status === 3) return '未通过'
-  if (status === 0) return '草稿'
+  if (status === 1 || status === '1') return '审核中'
+  if (status === 2 || status === '2') return '已通过'
+  if (status === 3 || status === '3') return '未通过'
+  if (status === 0 || status === '0') return '草稿'
   return status
 }
 
 // 过滤和分页
-const filteredMeetings = computed(() => {
+const filterMeetings = () => {
   let result = allMeetings.value.filter(m => {
-    const nameMatch = m.name.includes(searchParams.name)
+    const nameMatch = m.name.toLowerCase().includes(searchParams.name.toLowerCase())
     let dateMatch = true
-    if (searchParams.dateRange.length === 2) {
+    if (searchParams.dateRange && searchParams.dateRange.length === 2) {
       const start = new Date(searchParams.dateRange[0])
       const end = new Date(searchParams.dateRange[1])
       const meetingDate = new Date(m.startTime)
@@ -119,22 +125,29 @@ const filteredMeetings = computed(() => {
     }
     return nameMatch && dateMatch
   })
+  
   pagination.total = result.length
   // 简单分页
   const startIdx = (pagination.current - 1) * pagination.size
-  return result.slice(startIdx, startIdx + pagination.size)
-})
+  filteredMeetings.value = result.slice(startIdx, startIdx + pagination.size)
+}
 
-const filterMeetings = () => {
+const handlePageChange = (page: number) => {
+  pagination.current = page
+  filterMeetings()
+}
+
+const handleSearch = () => {
   pagination.current = 1 // 搜索时回到第一页
+  filterMeetings()
 }
 
 const viewDetail = (id: number) => {
-  router.push(`/userhome/meetingmanage/detail/${id}`)
+  router.push(`/adminhome/meetingmanage/detail/${id}`)
 }
 
 const editMeeting = (row: any) => {
-  router.push({ path: '/userhome/meetingmanage/edit', query: { id: row.id } })
+  router.push({ path: '/adminhome/meetingmanage/edit', query: { id: row.id } })
 }
 
 const confirmDeleteMeeting = (id) => {
@@ -158,7 +171,7 @@ const confirmDeleteMeeting = (id) => {
 }
 
 const goToCreate = () => {
-  router.push('/userhome/meetingmanage/create')
+  router.push('/adminhome/create-meeting')
 }
 
 const fetchMeetings = async () => {
@@ -169,6 +182,7 @@ const fetchMeetings = async () => {
       name: item.title, // 字段映射，兼容表格 prop="name"
       startTime: item.start_time // 字段映射，兼容表格 prop="startTime"
     }))
+    filterMeetings() // 初始化分页
   }
 }
 

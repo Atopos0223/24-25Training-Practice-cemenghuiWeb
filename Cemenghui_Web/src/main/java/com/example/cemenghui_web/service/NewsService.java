@@ -13,6 +13,9 @@ public class NewsService {
     private NewsMapper newsMapper;
 
     public int insertNews(News news) {
+        if(news.getTitle().equals("")){
+            return 0;
+        }
         return newsMapper.insertNews(news);
     }
 

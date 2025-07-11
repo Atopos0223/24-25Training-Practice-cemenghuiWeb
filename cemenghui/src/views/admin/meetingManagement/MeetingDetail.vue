@@ -3,6 +3,11 @@
     <h2 class="main-title"><el-icon><Calendar /></el-icon> 会议详情</h2>
     <el-divider />
     <div class="meeting-detail">
+      <el-button @click="$router.back()" style="margin-bottom: 20px;">
+        <el-icon><ArrowLeft /></el-icon>
+        返回
+      </el-button>
+      
       <el-card v-if="meeting">
         <h3>{{ meeting.name }}</h3>
         <el-descriptions column="2" border>

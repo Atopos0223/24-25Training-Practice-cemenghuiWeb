@@ -1,20 +1,12 @@
 <template>
-<<<<<<< Updated upstream
-  <div class="dynamic-detail">
-    <el-button @click="goBack">
-      <el-icon><ArrowLeft /></el-icon>
-      返回列表
-    </el-button>
-=======
   <el-card class="main-card" shadow="hover">
     <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 动态详情</h2>
     <el-divider />
     <div class="dynamic-detail">
-      <el-button @click="router.push('/userhome/industrydynamic/list')">
+      <el-button @click="goBack">
         <el-icon><ArrowLeft /></el-icon>
         返回列表
       </el-button>
->>>>>>> Stashed changes
 
       <el-card v-if="dynamicData" class="mt-4">
         <h2>{{ dynamicData.title }}</h2>
@@ -45,7 +37,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, User, Clock } from '@element-plus/icons-vue'
+import { ArrowLeft, User, Clock, TrendCharts } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
 interface Dynamic {

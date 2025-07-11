@@ -55,6 +55,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { TrendCharts } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
 const newsList = ref([])
@@ -76,7 +77,12 @@ const fetchList = async () => {
       }
     })
     if (res.data.code === 200) {
-      newsList.value = res.data.data.records || res.data.data || []
+      const records = res.data.data.records || res.data.data || []
+      // 为每个动态项添加canEdit属性，只有作者本人才能编辑
+      newsList.value = records.map(item => ({
+        ...item,
+        canEdit: item.author_id === userId
+      }))
       total.value = res.data.data.total || newsList.value.length
     } else {
       ElMessage.error(res.data.msg || '获取动态列表失败')
@@ -86,15 +92,15 @@ const fetchList = async () => {
   }
 }
 
-const handleView = (row) => {
-  router.push({ name: 'DynamicDetail', params: { id: row.id } })
+const viewDetail = (row) => {
+  router.push(`/userhome/industrydynamic/detail/${row.id}`)
 }
 
-const handleEdit = (row) => {
+const editDynamic = (row) => {
   router.push({ name: 'EditDynamic', params: { id: row.id } })
 }
 
-const handleDelete = (row) => {
+const deleteDynamic = (row) => {
   ElMessageBox.confirm(`确定要删除动态《${row.title}》吗？`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -115,6 +121,8 @@ const handleDelete = (row) => {
     ElMessage.info('已取消删除')
   })
 }
+
+
 
 function formatDateTime(val: string) {
   if (!val) return '';

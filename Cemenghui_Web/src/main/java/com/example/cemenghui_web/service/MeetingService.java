@@ -16,8 +16,10 @@ public class MeetingService {
         if (meeting.getCreateTime() == null) {
             meeting.setCreateTime(new java.util.Date());
         }
-        // status 1 表示未审核
-        meeting.setStatus(1);
+        // 只有当状态为null时才设置为默认值1（审核中）
+        if (meeting.getStatus() == null) {
+            meeting.setStatus(1);
+        }
         meetingMapper.insertMeeting(meeting);
     }
 

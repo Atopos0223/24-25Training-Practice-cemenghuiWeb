@@ -1,6 +1,4 @@
 <template>
-
-
   <el-card class="main-card" shadow="hover">
     <h2 class="main-title"><el-icon><TrendCharts /></el-icon> 动态详情</h2>
     <el-divider />
@@ -9,7 +7,6 @@
         <el-icon><ArrowLeft /></el-icon>
         返回列表
       </el-button>
-
 
       <el-card v-if="dynamicData" class="mt-4">
         <h2>{{ dynamicData.title }}</h2>
