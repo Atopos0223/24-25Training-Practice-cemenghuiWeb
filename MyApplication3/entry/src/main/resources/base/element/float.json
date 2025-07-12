@@ -1,0 +1,56 @@
+{
+  "float": [
+    {
+      "name": "title_font_size",
+      "value": "24vp"
+    },
+    {
+      "name": "subtitle_font_size",
+      "value": "20vp"
+    },
+    {
+      "name": "meeting_title_font_size",
+      "value": "26vp"
+    },
+    {
+      "name": "status_font_size",
+      "value": "16vp"
+    },
+    {
+      "name": "card_label_font_size",
+      "value": "18vp"
+    },
+    {
+      "name": "card_value_font_size",
+      "value": "20vp"
+    },
+    {
+      "name": "description_title_font_size",
+      "value": "20vp"
+    },
+    {
+      "name": "description_content_font_size",
+      "value": "18vp"
+    },
+    {
+      "name": "button_font_size",
+      "value": "20vp"
+    },
+    {
+      "name": "input_label_font_size",
+      "value": "18vp"
+    },
+    {
+      "name": "input_font_size",
+      "value": "18vp"
+    },
+    {
+      "name": "error_font_size",
+      "value": "16vp"
+    },
+    {
+      "name": "page_text_font_size",
+      "value": "50fp"
+    }
+  ]
+}

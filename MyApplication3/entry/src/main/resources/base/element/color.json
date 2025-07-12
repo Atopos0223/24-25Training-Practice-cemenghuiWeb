@@ -1,0 +1,131 @@
+{
+  "color": [
+    {
+      "name": "primary",
+      "value": "#1a73e8"
+    },
+    {
+      "name": "white",
+      "value": "#ffffff"
+    },
+    {
+      "name": "text_primary",
+      "value": "#333333"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#666666"
+    },
+    {
+      "name": "error",
+      "value": "#e74c3c"
+    },
+    {
+      "name": "background",
+      "value": "#f8f9fa"
+    },
+    {
+      "name": "card_background",
+      "value": "#f8f9fa"
+    },
+    {
+      "name": "button_background",
+      "value": "#e6f0ff"
+    },
+    {
+      "name": "button_disabled",
+      "value": "#95a5a6"
+    },
+    {
+      "name": "border",
+      "value": "#dddddd"
+    },
+    {
+      "name": "icon",
+      "value": "#666666"
+    },
+    {
+      "name": "status_not_started",
+      "value": "#3498db"
+    },
+    {
+      "name": "status_in_progress",
+      "value": "#2ecc71"
+    },
+    {
+      "name": "status_ended",
+      "value": "#95a5a6"
+    },
+    {
+      "name": "status_cancelled",
+      "value": "#e74c3c"
+    },
+    {
+      "name": "status_unknown",
+      "value": "#9b59b6"
+    },
+    {
+      "name": "start_window_background",
+      "value": "#FFFFFF"
+    },
+
+    {
+      "name": "primary_text",
+      "value": "#2D3748"
+    },
+    {
+      "name": "secondary_text",
+      "value": "#718096"
+    },
+    {
+      "name": "hint_text",
+      "value": "#A0AEC0"
+    },
+
+    {
+      "name": "button_bg",
+      "value": "#E2E8F0"
+    },
+    {
+      "name": "input_bg",
+      "value": "#EDF2F7"
+    },
+    {
+      "name": "tag_bg",
+      "value": "#EBF4FF"
+    },
+    {
+      "name": "shadow",
+      "value": "#1a4A6FA5"
+    },
+    {
+      "name": "divider",
+      "value": "#E2E8F0"
+    },
+    {
+      "name": "tab_active_bg",
+      "value": "#EBF4FF"
+    },
+    {
+      "name": "accent",
+      "value": "#4299E1"
+    },
+    {
+      "name": "success",
+      "value": "#48BB78"
+    },
+    {
+      "name": "warning",
+      "value": "#ED8936"
+    },
+
+    {
+      "name": "card_bg",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "card_shadow",
+      "value": "#1a000000"
+    }
+  ]
+}

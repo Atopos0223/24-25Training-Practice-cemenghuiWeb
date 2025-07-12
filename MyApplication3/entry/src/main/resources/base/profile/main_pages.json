@@ -1,0 +1,14 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/MainPage",
+    "pages/MeetingList",
+    "pages/MeetingDetailPage",
+    "pages/NewsDetail",
+    "pages/CharityPage",
+    "pages/StandardPage",
+    "pages/ToolsPage",
+    "pages/TrainingPage",
+    "pages/FillInfoPage"
+  ]
+}
